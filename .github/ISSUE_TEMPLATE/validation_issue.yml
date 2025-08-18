@@ -1,0 +1,105 @@
+name: Validation Issue
+description: Report incorrect validation behavior (false positive/negative)
+title: "[Validation]: "
+labels: ["validation", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to report issues with validation logic - when the validator incorrectly flags valid GTFS or misses invalid GTFS.
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What type of validation issue is this?
+      options:
+        - False Positive (incorrectly reports an error for valid GTFS)
+        - False Negative (misses an error in invalid GTFS)
+        - Incorrect Error Message (reports wrong error type/message)
+        - Missing Validation (should validate something but doesn't)
+    validations:
+      required: true
+
+  - type: textarea
+    id: validator
+    attributes:
+      label: Validator/Notice Code
+      description: Which validator or notice code is involved?
+      placeholder: e.g. missing_required_field, route_color_contrast, foreign_key_violation
+    validations:
+      required: true
+
+  - type: textarea
+    id: gtfs-spec
+    attributes:
+      label: GTFS Specification Reference
+      description: Reference to the relevant GTFS specification section
+      placeholder: Link to gtfs.org specification or quote the relevant requirement
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current Behavior
+      description: What does the validator currently do?
+      placeholder: Describe the current validation behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should the validator do according to the GTFS spec?
+      placeholder: Describe what the correct behavior should be...
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample-data
+    attributes:
+      label: Sample GTFS Data
+      description: Provide sample GTFS data that demonstrates the issue
+      render: text
+      placeholder: |
+        Provide the relevant GTFS file contents, e.g.:
+        
+        agency.txt:
+        agency_id,agency_name,agency_url,agency_timezone
+        1,Demo Transit,https://example.com,America/New_York
+        
+        routes.txt:
+        route_id,agency_id,route_short_name,route_long_name,route_type
+        A,1,10,Airport,3
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation-output
+    attributes:
+      label: Current Validation Output
+      description: What does the validator currently output for this data?
+      render: json
+      placeholder: Paste the validation output here...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context about the validation issue
+      placeholder: Add any other information that would be helpful...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I verified this against the official GTFS specification
+          required: true
+        - label: I searched existing issues and didn't find a duplicate
+          required: true
+        - label: I tested with the latest version of NETEX GTFS Conveter
+          required: true
