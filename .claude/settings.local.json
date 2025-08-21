@@ -6,7 +6,9 @@
       "Bash(go test:*)",
       "Bash(go fmt:*)",
       "Bash(golangci-lint run:*)",
-      "Bash(go vet:*)"
+      "Bash(go vet:*)",
+      "Bash(/dev/null)",
+      "Bash(echo \"Exit code: $?\")"
     ],
     "deny": [],
     "ask": []
