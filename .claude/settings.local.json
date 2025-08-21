@@ -8,7 +8,10 @@
       "Bash(golangci-lint run:*)",
       "Bash(go vet:*)",
       "Bash(/dev/null)",
-      "Bash(echo \"Exit code: $?\")"
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(go clean:*)",
+      "Bash(rm:*)",
+      "Bash(go mod:*)"
     ],
     "deny": [],
     "ask": []

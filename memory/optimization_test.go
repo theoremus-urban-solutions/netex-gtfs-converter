@@ -3,6 +3,7 @@ package memory
 import (
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -454,9 +455,9 @@ func TestMemoryMonitor_WithCallback(t *testing.T) {
 	// Use very short interval for testing
 	monitor.interval = time.Millisecond * 10
 
-	callbackCount := 0
+	var callbackCount int64
 	monitor.AddCallback(func(stats MemoryStats) {
-		callbackCount++
+		atomic.AddInt64(&callbackCount, 1)
 	})
 
 	monitor.Start()
@@ -467,7 +468,7 @@ func TestMemoryMonitor_WithCallback(t *testing.T) {
 	monitor.Stop()
 
 	// Should have received at least one callback
-	if callbackCount == 0 {
+	if atomic.LoadInt64(&callbackCount) == 0 {
 		t.Error("Expected at least one callback to be called")
 	}
 }
