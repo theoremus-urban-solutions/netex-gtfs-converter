@@ -43,7 +43,7 @@ func (cv *CalendarValidator) ValidateServicePattern(pattern *ServicePattern) []s
 		if pattern.ValidityPeriod.StartDate.After(pattern.ValidityPeriod.EndDate) {
 			issues = append(issues, "Service pattern start date is after end date")
 		}
-		
+
 		// Check if validity period is reasonable
 		if cv.validationLevel >= ValidationStrict {
 			duration := pattern.ValidityPeriod.EndDate.Sub(pattern.ValidityPeriod.StartDate)
@@ -67,7 +67,7 @@ func (cv *CalendarValidator) ValidateServicePattern(pattern *ServicePattern) []s
 		for _, day := range pattern.OperatingDays {
 			operatingDaysMap[day] = true
 		}
-		
+
 		for _, day := range pattern.NonOperatingDays {
 			if operatingDaysMap[day] {
 				issues = append(issues, fmt.Sprintf("Day %s is both operating and non-operating", day.String()))
@@ -108,7 +108,7 @@ func (cv *CalendarValidator) ValidateOperatingPeriod(period *OperatingPeriod) []
 	if period.StartDate.IsZero() {
 		issues = append(issues, "Operating period missing start date")
 	}
-	
+
 	if period.EndDate.IsZero() {
 		issues = append(issues, "Operating period missing end date")
 	}
@@ -192,7 +192,7 @@ func (cv *CalendarValidator) validateExceptions(exceptions []*ServiceException) 
 	issues := make([]string, 0)
 
 	dateMap := make(map[string]*ServiceException)
-	
+
 	for i, exception := range exceptions {
 		if exception.Date.IsZero() {
 			issues = append(issues, fmt.Sprintf("Exception %d missing date", i))
@@ -200,7 +200,7 @@ func (cv *CalendarValidator) validateExceptions(exceptions []*ServiceException) 
 		}
 
 		dateStr := exception.Date.Format("2006-01-02")
-		
+
 		// Check for duplicate dates
 		if existing, exists := dateMap[dateStr]; exists {
 			if existing.Type != exception.Type {
@@ -234,7 +234,7 @@ func (cv *CalendarValidator) validateSeasonalVariations(variations []*SeasonalVa
 		if variation.StartDate.IsZero() {
 			issues = append(issues, fmt.Sprintf("Seasonal variation %d missing start date", i))
 		}
-		
+
 		if variation.EndDate.IsZero() {
 			issues = append(issues, fmt.Sprintf("Seasonal variation %d missing end date", i))
 		}
@@ -305,7 +305,7 @@ func (cv *CalendarValidator) validateSeasonDefinition(season *SeasonDefinition) 
 		if season.StartMonth == time.February && season.StartDay > 29 {
 			issues = append(issues, "Start day too high for February")
 		}
-		
+
 		if season.EndMonth == time.February && season.EndDay > 29 {
 			issues = append(issues, "End day too high for February")
 		}
@@ -404,7 +404,7 @@ func (cv *CalendarValidator) ValidateAgainstGTFSRules(patterns []*ServicePattern
 		if pattern.ValidityPeriod != nil {
 			startStr := pattern.ValidityPeriod.StartDate.Format("20060102")
 			endStr := pattern.ValidityPeriod.EndDate.Format("20060102")
-			
+
 			if len(startStr) != 8 || len(endStr) != 8 {
 				issues = append(issues, fmt.Sprintf("Pattern %s date format issue", pattern.ID))
 			}

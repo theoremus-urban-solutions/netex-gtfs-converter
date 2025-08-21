@@ -7,6 +7,11 @@ import (
 	"github.com/theoremus-urban-solutions/netex-gtfs-converter/model"
 )
 
+const (
+	trueString  = "true"
+	falseString = "false"
+)
+
 // EuropeanAccessibilityProducer handles European accessibility features
 type EuropeanAccessibilityProducer struct {
 	netexRepo NetexRepository
@@ -33,17 +38,17 @@ func (p *EuropeanAccessibilityProducer) ProduceAccessibilityInfo(assessment *mod
 
 		// Check wheelchair access
 		switch strings.ToLower(limitation.WheelchairAccess) {
-		case "true":
+		case trueString:
 			return "1" // Accessible
-		case "false":
+		case falseString:
 			return "2" // Not accessible
 		}
 
 		// Check step-free access as alternative indicator
 		switch strings.ToLower(limitation.StepFreeAccess) {
-		case "true":
+		case trueString:
 			return "1" // Accessible
-		case "false":
+		case falseString:
 			return "2" // Not accessible
 		}
 	}
@@ -73,9 +78,9 @@ func (p *EuropeanVehicleProducer) ProduceVehicleAccessibility(vehicleType *model
 
 	// Check explicit wheelchair accessibility
 	switch strings.ToLower(vehicleType.WheelchairAccessible) {
-	case "true":
+	case trueString:
 		return "1" // Accessible
-	case "false":
+	case falseString:
 		return "2" // Not accessible
 	case "partial":
 		// Check if there are wheelchair places
@@ -89,9 +94,9 @@ func (p *EuropeanVehicleProducer) ProduceVehicleAccessibility(vehicleType *model
 	}
 
 	// Check low floor and lift/ramp indicators
-	hasLowFloor := strings.ToLower(vehicleType.LowFloor) == "true" ||
+	hasLowFloor := strings.ToLower(vehicleType.LowFloor) == trueString ||
 		strings.ToLower(vehicleType.LowFloor) == "partial"
-	hasLiftOrRamp := strings.ToLower(vehicleType.HasLiftOrRamp) == "true"
+	hasLiftOrRamp := strings.ToLower(vehicleType.HasLiftOrRamp) == trueString
 
 	if hasLowFloor || hasLiftOrRamp {
 		// Check if there are wheelchair spaces
@@ -116,9 +121,9 @@ func (p *EuropeanVehicleProducer) ProduceBikesAllowed(vehicleType *model.Vehicle
 
 	// Check explicit cycles allowed
 	switch strings.ToLower(vehicleType.CyclesAllowed) {
-	case "true":
+	case trueString:
 		return "1" // Bicycles allowed
-	case "false":
+	case falseString:
 		return "2" // Bicycles not allowed
 	}
 

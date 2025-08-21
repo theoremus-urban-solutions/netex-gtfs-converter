@@ -9,6 +9,14 @@ import (
 	"github.com/theoremus-urban-solutions/netex-gtfs-converter/producer"
 )
 
+// titleCase converts a string to title case (first letter uppercase)
+func titleCase(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
+}
+
 // createLargeServiceJourney creates a service journey with many stops for testing
 func createLargeServiceJourney(stopCount int) *model.ServiceJourney {
 	journey := &model.ServiceJourney{
@@ -78,7 +86,7 @@ func createLargeStopPlace(quayCount int) *model.StopPlace {
 
 		quay := model.Quay{
 			ID:   fmt.Sprintf("quay_%d", i+1),
-			Name: fmt.Sprintf("%s %s %s", strings.Title(mode), strings.Title(level), fmt.Sprintf("Platform %d", i+1)),
+			Name: fmt.Sprintf("%s %s %s", titleCase(mode), titleCase(level), fmt.Sprintf("Platform %d", i+1)),
 			Centroid: &model.Centroid{
 				Location: &model.Location{
 					// Spread quays around the base location
@@ -122,7 +130,7 @@ func createComplexInterchangeStation(quayCount int) *model.StopPlace {
 		level := levels[i%len(levels)]
 
 		quay.Name = fmt.Sprintf("%s Platform %d %s Level",
-			strings.Title(mode), (i%5)+1, strings.Title(level))
+			titleCase(mode), (i%5)+1, titleCase(level))
 
 		// Add more complex accessibility patterns
 		if strings.Contains(mode, "train") || strings.Contains(mode, "metro") {
@@ -263,7 +271,9 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			AgencyURL:      fmt.Sprintf("https://agency%d.example.com", i),
 			AgencyTimezone: "Europe/Oslo",
 		}
-		gtfsRepo.SaveEntity(agency)
+		if err := gtfsRepo.SaveEntity(agency); err != nil {
+			panic(err)
+		}
 	}
 
 	// Create routes
@@ -275,7 +285,9 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			RouteLongName:  fmt.Sprintf("Test Route %d", i),
 			RouteType:      3, // Bus
 		}
-		gtfsRepo.SaveEntity(route)
+		if err := gtfsRepo.SaveEntity(route); err != nil {
+			panic(err)
+		}
 	}
 
 	// Create stops
@@ -286,7 +298,9 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			StopLat:  59.9 + float64(i%100)*0.001,
 			StopLon:  10.7 + float64(i/100)*0.001,
 		}
-		gtfsRepo.SaveEntity(stop)
+		if err := gtfsRepo.SaveEntity(stop); err != nil {
+			panic(err)
+		}
 	}
 
 	// Create trips
@@ -296,7 +310,9 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			ServiceID: fmt.Sprintf("service_%d", i%50), // Distribute across services
 			TripID:    fmt.Sprintf("trip_%d", i),
 		}
-		gtfsRepo.SaveEntity(trip)
+		if err := gtfsRepo.SaveEntity(trip); err != nil {
+			panic(err)
+		}
 	}
 
 	// Create stop times
@@ -308,7 +324,9 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			StopID:        fmt.Sprintf("stop_%d", i%1000),
 			StopSequence:  (i % 50) + 1,
 		}
-		gtfsRepo.SaveEntity(stopTime)
+		if err := gtfsRepo.SaveEntity(stopTime); err != nil {
+			panic(err)
+		}
 	}
 
 	// Create frequencies
@@ -320,7 +338,9 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			HeadwaySecs: 300 + (i%12)*60, // 5-17 minutes
 			ExactTimes:  "0",
 		}
-		gtfsRepo.SaveEntity(frequency)
+		if err := gtfsRepo.SaveEntity(frequency); err != nil {
+			panic(err)
+		}
 	}
 
 	// Create pathways
@@ -334,7 +354,9 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			Length:          float64(50 + (i%20)*10), // 50-250 meters
 			TraversalTime:   60 + (i%5)*30,           // 1-3 minutes
 		}
-		gtfsRepo.SaveEntity(pathway)
+		if err := gtfsRepo.SaveEntity(pathway); err != nil {
+			panic(err)
+		}
 	}
 
 	// Create levels
@@ -345,6 +367,8 @@ func populateGtfsRepository(gtfsRepo producer.GtfsRepository, entityCount int) {
 			LevelIndex: float64(i%5 - 2), // -2 to +2 levels
 			LevelName:  fmt.Sprintf("Level %d", i),
 		}
-		gtfsRepo.SaveEntity(level)
+		if err := gtfsRepo.SaveEntity(level); err != nil {
+			panic(err)
+		}
 	}
 }

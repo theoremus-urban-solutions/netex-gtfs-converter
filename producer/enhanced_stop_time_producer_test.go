@@ -18,16 +18,16 @@ func TestEnhancedStopTimeProducer_ProduceStopTimesForTrip(t *testing.T) {
 
 	serviceJourney := &model.ServiceJourney{
 		ID:                "sj1",
-		JourneyPatternRef: "jp1",
+		JourneyPatternRef: model.ServiceJourneyPatternRef{Ref: "jp1"},
 		PassingTimes: &model.PassingTimes{
 			TimetabledPassingTime: []model.TimetabledPassingTime{
 				{
 					PointInJourneyPatternRef: "stop1",
-					DepartureTime:            timePtr("08:00:00"),
+					DepartureTime:            "08:00:00",
 				},
 				{
 					PointInJourneyPatternRef: "stop3",
-					ArrivalTime:              timePtr("08:10:00"),
+					ArrivalTime:              "08:10:00",
 				},
 			},
 		},
@@ -74,21 +74,21 @@ func TestEnhancedStopTimeProducer_EuropeanPickupDropoffRules(t *testing.T) {
 
 	serviceJourney := &model.ServiceJourney{
 		ID:                "sj1",
-		JourneyPatternRef: "jp1",
+		JourneyPatternRef: model.ServiceJourneyPatternRef{Ref: "jp1"},
 		PassingTimes: &model.PassingTimes{
 			TimetabledPassingTime: []model.TimetabledPassingTime{
 				{
 					PointInJourneyPatternRef: "stop1",
-					DepartureTime:            timePtr("08:00:00"),
+					DepartureTime:            "08:00:00",
 				},
 				{
 					PointInJourneyPatternRef: "stop2",
-					ArrivalTime:              timePtr("08:05:00"),
-					DepartureTime:            timePtr("08:05:30"),
+					ArrivalTime:              "08:05:00",
+					DepartureTime:            "08:05:30",
 				},
 				{
 					PointInJourneyPatternRef: "stop3",
-					ArrivalTime:              timePtr("08:10:00"),
+					ArrivalTime:              "08:10:00",
 				},
 			},
 		},
@@ -216,8 +216,8 @@ func TestEnhancedStopTimeProducer_FallbackToDefault(t *testing.T) {
 	input := StopTimeInput{
 		TimetabledPassingTime: &model.TimetabledPassingTime{
 			PointInJourneyPatternRef: "stop1",
-			ArrivalTime:              timePtr("08:00:00"),
-			DepartureTime:            timePtr("08:00:30"),
+			ArrivalTime:              "08:00:00",
+			DepartureTime:            "08:00:30",
 		},
 		Trip:            &model.Trip{TripID: "trip1"},
 		CurrentHeadSign: "Test Route",

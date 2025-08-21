@@ -13,13 +13,13 @@ type HolidayDetector struct {
 
 // Holiday represents a holiday with its characteristics
 type Holiday struct {
-	Date        time.Time   `json:"date"`
-	Name        string      `json:"name"`
-	Type        HolidayType `json:"type"`
-	IsNational  bool        `json:"is_national"`
-	IsRegional  bool        `json:"is_regional"`
-	Regions     []string    `json:"regions,omitempty"`
-	Observance  Observance  `json:"observance"`
+	Date       time.Time   `json:"date"`
+	Name       string      `json:"name"`
+	Type       HolidayType `json:"type"`
+	IsNational bool        `json:"is_national"`
+	IsRegional bool        `json:"is_regional"`
+	Regions    []string    `json:"regions,omitempty"`
+	Observance Observance  `json:"observance"`
 }
 
 // HolidayType defines different types of holidays
@@ -479,7 +479,7 @@ func (hd *HolidayDetector) applyObservanceRules(holidays []*Holiday) []*Holiday 
 
 	for _, holiday := range holidays {
 		observedDate := hd.getObservedDate(holiday.Date, holiday.Observance)
-		
+
 		if !observedDate.Equal(holiday.Date) {
 			// Create a new holiday for the observed date
 			observedHoliday := &Holiday{

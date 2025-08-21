@@ -241,19 +241,20 @@ func (p *AdvancedStopTimeProducer) interpolateMissingTimes(sequence []*StopInSeq
 		}
 
 		// Interpolate based on available anchor points
-		if prevTimetabledIndex >= 0 && nextTimetabledIndex >= 0 {
+		switch {
+		case prevTimetabledIndex >= 0 && nextTimetabledIndex >= 0:
 			// Interpolate between two known times
 			err := p.interpolateBetweenTimes(sequence, prevTimetabledIndex, nextTimetabledIndex, shape)
 			if err != nil {
 				return err
 			}
-		} else if prevTimetabledIndex >= 0 {
+		case prevTimetabledIndex >= 0:
 			// Extrapolate forward from previous time
 			err := p.extrapolateForward(sequence, prevTimetabledIndex, i, shape)
 			if err != nil {
 				return err
 			}
-		} else if nextTimetabledIndex >= 0 {
+		case nextTimetabledIndex >= 0:
 			// Extrapolate backward from next time
 			err := p.extrapolateBackward(sequence, i, nextTimetabledIndex, shape)
 			if err != nil {
@@ -479,7 +480,7 @@ func (p *AdvancedStopTimeProducer) secondsToTime(seconds int) time.Time {
 
 	// Handle day overflow for GTFS (24:00:00+)
 	day := hours / 24
-	hours = hours % 24
+	hours %= 24
 
 	baseDate := time.Date(2000, 1, 1+day, hours, minutes, secs, 0, time.UTC)
 	return baseDate

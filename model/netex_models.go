@@ -34,35 +34,35 @@ type Presentation struct {
 
 // Network represents a NeTEx Network
 type Network struct {
-	XMLName      xml.Name `xml:"Network"`
-	ID           string   `xml:"id,attr"`
-	Version      string   `xml:"version,attr"`
-	Name         string   `xml:"Name"`
-	ShortName    string   `xml:"ShortName"`
-	Description  string   `xml:"Description"`
-	PrivateCode  string   `xml:"PrivateCode"`
-	Members      *NetworkMembers `xml:"members"`
+	XMLName      xml.Name            `xml:"Network"`
+	ID           string              `xml:"id,attr"`
+	Version      string              `xml:"version,attr"`
+	Name         string              `xml:"Name"`
+	ShortName    string              `xml:"ShortName"`
+	Description  string              `xml:"Description"`
+	PrivateCode  string              `xml:"PrivateCode"`
+	Members      *NetworkMembers     `xml:"members"`
 	AuthorityRef NetworkAuthorityRef `xml:"AuthorityRef"`
 }
 
 // NetworkAuthorityRef represents an authority reference in a network
 type NetworkAuthorityRef struct {
-	XMLName   xml.Name `xml:"AuthorityRef"`
-	Ref       string   `xml:"ref,attr"`
-	VersionRef string  `xml:"versionRef,attr"`
+	XMLName    xml.Name `xml:"AuthorityRef"`
+	Ref        string   `xml:"ref,attr"`
+	VersionRef string   `xml:"versionRef,attr"`
 }
 
 // NetworkMembers represents the members of a Network
 type NetworkMembers struct {
-	XMLName xml.Name `xml:"members"`
+	XMLName xml.Name         `xml:"members"`
 	LineRef []NetworkLineRef `xml:"LineRef"`
 }
 
 // NetworkLineRef represents a line reference in a network
 type NetworkLineRef struct {
-	XMLName   xml.Name `xml:"LineRef"`
-	Ref       string   `xml:"ref,attr"`
-	VersionRef string  `xml:"versionRef,attr"`
+	XMLName    xml.Name `xml:"LineRef"`
+	Ref        string   `xml:"ref,attr"`
+	VersionRef string   `xml:"versionRef,attr"`
 }
 
 // Authority represents a NeTEx Authority
@@ -87,31 +87,31 @@ type ContactDetails struct {
 
 // ServiceJourney represents a NeTEx ServiceJourney
 type ServiceJourney struct {
-	XMLName           xml.Name           `xml:"ServiceJourney"`
-	ID                string             `xml:"id,attr"`
-	Version           string             `xml:"version,attr"`
+	XMLName           xml.Name                 `xml:"ServiceJourney"`
+	ID                string                   `xml:"id,attr"`
+	Version           string                   `xml:"version,attr"`
 	JourneyPatternRef ServiceJourneyPatternRef `xml:"JourneyPatternRef"`
-	LineRef           ServiceJourneyLineRef     `xml:"LineRef"`
-	OperatorRef       string             `xml:"OperatorRef"`
-	ServiceAlteration string             `xml:"ServiceAlteration"`
-	Monitored         bool               `xml:"Monitored"`
-	PassingTimes      *PassingTimes      `xml:"passingTimes"`
-	DayTypes          *DayTypes          `xml:"dayTypes"`
-	NoticeAssignments *NoticeAssignments `xml:"NoticeAssignments"`
+	LineRef           ServiceJourneyLineRef    `xml:"LineRef"`
+	OperatorRef       string                   `xml:"OperatorRef"`
+	ServiceAlteration string                   `xml:"ServiceAlteration"`
+	Monitored         bool                     `xml:"Monitored"`
+	PassingTimes      *PassingTimes            `xml:"passingTimes"`
+	DayTypes          *DayTypes                `xml:"dayTypes"`
+	NoticeAssignments *NoticeAssignments       `xml:"NoticeAssignments"`
 }
 
 // ServiceJourneyPatternRef represents a journey pattern reference in a service journey
 type ServiceJourneyPatternRef struct {
-	XMLName   xml.Name `xml:"JourneyPatternRef"`
-	Ref       string   `xml:"ref,attr"`
-	VersionRef string  `xml:"versionRef,attr"`
+	XMLName    xml.Name `xml:"JourneyPatternRef"`
+	Ref        string   `xml:"ref,attr"`
+	VersionRef string   `xml:"versionRef,attr"`
 }
 
 // ServiceJourneyLineRef represents a line reference in a service journey
 type ServiceJourneyLineRef struct {
-	XMLName   xml.Name `xml:"LineRef"`
-	Ref       string   `xml:"ref,attr"`
-	VersionRef string  `xml:"versionRef,attr"`
+	XMLName    xml.Name `xml:"LineRef"`
+	Ref        string   `xml:"ref,attr"`
+	VersionRef string   `xml:"versionRef,attr"`
 }
 
 // PassingTimes represents the passing times of a service journey
@@ -155,57 +155,57 @@ type NoticeAssignment struct {
 
 // JourneyPattern represents a NeTEx JourneyPattern
 type JourneyPattern struct {
-	XMLName          xml.Name          `xml:"JourneyPattern"`
-	ID               string            `xml:"id,attr"`
-	Version          string            `xml:"version,attr"`
-	Name             string            `xml:"Name"`
-	Description      string            `xml:"Description"`
-	PrivateCode      string            `xml:"PrivateCode"`
-	RouteRef         string            `xml:"RouteRef"`
-	DirectionType    string            `xml:"DirectionType"`
-	PointsInSequence *PointsInSequence `xml:"pointsInSequence"`
-	DestinationDisplayRef string       `xml:"DestinationDisplayRef"`
+	XMLName               xml.Name          `xml:"JourneyPattern"`
+	ID                    string            `xml:"id,attr"`
+	Version               string            `xml:"version,attr"`
+	Name                  string            `xml:"Name"`
+	Description           string            `xml:"Description"`
+	PrivateCode           string            `xml:"PrivateCode"`
+	RouteRef              string            `xml:"RouteRef"`
+	DirectionType         string            `xml:"DirectionType"`
+	PointsInSequence      *PointsInSequence `xml:"pointsInSequence"`
+	DestinationDisplayRef string            `xml:"DestinationDisplayRef"`
 }
 
 // ServiceJourneyPattern represents a NeTEx ServiceJourneyPattern (same structure as JourneyPattern)
 type ServiceJourneyPattern struct {
-	XMLName          xml.Name          `xml:"ServiceJourneyPattern"`
-	ID               string            `xml:"id,attr"`
-	Version          string            `xml:"version,attr"`
-	Name             string            `xml:"Name"`
-	Description      string            `xml:"Description"`
-	PrivateCode      string            `xml:"PrivateCode"`
-	RouteRef         ServiceJourneyPatternRouteRef `xml:"RouteRef"`
-	DirectionType    string            `xml:"DirectionType"`
-	PointsInSequence *PointsInSequence `xml:"pointsInSequence"`
+	XMLName               xml.Name                                   `xml:"ServiceJourneyPattern"`
+	ID                    string                                     `xml:"id,attr"`
+	Version               string                                     `xml:"version,attr"`
+	Name                  string                                     `xml:"Name"`
+	Description           string                                     `xml:"Description"`
+	PrivateCode           string                                     `xml:"PrivateCode"`
+	RouteRef              ServiceJourneyPatternRouteRef              `xml:"RouteRef"`
+	DirectionType         string                                     `xml:"DirectionType"`
+	PointsInSequence      *PointsInSequence                          `xml:"pointsInSequence"`
 	DestinationDisplayRef ServiceJourneyPatternDestinationDisplayRef `xml:"DestinationDisplayRef"`
 }
 
 // ServiceJourneyPatternRouteRef represents a route reference in a service journey pattern
 type ServiceJourneyPatternRouteRef struct {
-	XMLName   xml.Name `xml:"RouteRef"`
-	Ref       string   `xml:"ref,attr"`
-	VersionRef string  `xml:"versionRef,attr"`
+	XMLName    xml.Name `xml:"RouteRef"`
+	Ref        string   `xml:"ref,attr"`
+	VersionRef string   `xml:"versionRef,attr"`
 }
 
 // ServiceJourneyPatternDestinationDisplayRef represents a destination display reference
 type ServiceJourneyPatternDestinationDisplayRef struct {
-	XMLName   xml.Name `xml:"DestinationDisplayRef"`
-	Ref       string   `xml:"ref,attr"`
-	VersionRef string  `xml:"versionRef,attr"`
+	XMLName    xml.Name `xml:"DestinationDisplayRef"`
+	Ref        string   `xml:"ref,attr"`
+	VersionRef string   `xml:"versionRef,attr"`
 }
 
 // ToJourneyPattern converts ServiceJourneyPattern to JourneyPattern
 func (sjp *ServiceJourneyPattern) ToJourneyPattern() *JourneyPattern {
 	return &JourneyPattern{
 		ID:                    sjp.ID,
-		Version:              sjp.Version,
-		Name:                 sjp.Name,
-		Description:          sjp.Description,
-		PrivateCode:          sjp.PrivateCode,
-		RouteRef:             sjp.RouteRef.Ref,
-		DirectionType:        sjp.DirectionType,
-		PointsInSequence:     sjp.PointsInSequence,
+		Version:               sjp.Version,
+		Name:                  sjp.Name,
+		Description:           sjp.Description,
+		PrivateCode:           sjp.PrivateCode,
+		RouteRef:              sjp.RouteRef.Ref,
+		DirectionType:         sjp.DirectionType,
+		PointsInSequence:      sjp.PointsInSequence,
 		DestinationDisplayRef: sjp.DestinationDisplayRef.Ref,
 	}
 }
@@ -256,9 +256,9 @@ type Route struct {
 
 // RouteLineRef represents a line reference in a route
 type RouteLineRef struct {
-	XMLName   xml.Name `xml:"LineRef"`
-	Ref       string   `xml:"ref,attr"`
-	VersionRef string  `xml:"versionRef,attr"`
+	XMLName    xml.Name `xml:"LineRef"`
+	Ref        string   `xml:"ref,attr"`
+	VersionRef string   `xml:"versionRef,attr"`
 }
 
 // StopPlace represents a NeTEx StopPlace
@@ -434,9 +434,9 @@ type DatedServiceJourney struct {
 
 // PublicationDelivery represents the root NeTEx XML structure
 type PublicationDelivery struct {
-	XMLName       xml.Name       `xml:"PublicationDelivery"`
-	Version       string         `xml:"version,attr"`
-	DataObjects   *DataObjects   `xml:"DataObjects"`
+	XMLName        xml.Name        `xml:"PublicationDelivery"`
+	Version        string          `xml:"version,attr"`
+	DataObjects    *DataObjects    `xml:"DataObjects"`
 	CompositeFrame *CompositeFrame `xml:"CompositeFrame"`
 }
 
@@ -448,20 +448,20 @@ type DataObjects struct {
 
 // CompositeFrame contains frames with different types of data
 type CompositeFrame struct {
-	XMLName           xml.Name           `xml:"CompositeFrame"`
-	ID                string             `xml:"id,attr"`
-	Version           string             `xml:"version,attr"`
-	Frames            *Frames            `xml:"Frames"`
+	XMLName xml.Name `xml:"CompositeFrame"`
+	ID      string   `xml:"id,attr"`
+	Version string   `xml:"version,attr"`
+	Frames  *Frames  `xml:"Frames"`
 }
 
 // Frames contains different frame types
 type Frames struct {
-	XMLName            xml.Name            `xml:"Frames"`
-	ResourceFrame      *ResourceFrame      `xml:"ResourceFrame"`
-	ServiceFrame       *ServiceFrame       `xml:"ServiceFrame"`
+	XMLName              xml.Name              `xml:"Frames"`
+	ResourceFrame        *ResourceFrame        `xml:"ResourceFrame"`
+	ServiceFrame         *ServiceFrame         `xml:"ServiceFrame"`
 	ServiceCalendarFrame *ServiceCalendarFrame `xml:"ServiceCalendarFrame"`
-	TimetableFrame     *TimetableFrame     `xml:"TimetableFrame"`
-	SiteFrame          *SiteFrame          `xml:"SiteFrame"`
+	TimetableFrame       *TimetableFrame       `xml:"TimetableFrame"`
+	SiteFrame            *SiteFrame            `xml:"SiteFrame"`
 }
 
 // ResourceFrame contains authorities and other resources
@@ -480,14 +480,14 @@ type Authorities struct {
 
 // ServiceFrame contains lines, routes, and journey patterns
 type ServiceFrame struct {
-	XMLName         xml.Name         `xml:"ServiceFrame"`
-	ID              string           `xml:"id,attr"`
-	Version         string           `xml:"version,attr"`
-	Lines           *Lines           `xml:"Lines"`
-	Routes          *Routes          `xml:"Routes"`
-	JourneyPatterns *JourneyPatterns `xml:"JourneyPatterns"`
-	DestinationDisplays *DestinationDisplays `xml:"DestinationDisplays"`
-	ScheduledStopPoints *ScheduledStopPoints `xml:"ScheduledStopPoints"`
+	XMLName                    xml.Name                    `xml:"ServiceFrame"`
+	ID                         string                      `xml:"id,attr"`
+	Version                    string                      `xml:"version,attr"`
+	Lines                      *Lines                      `xml:"Lines"`
+	Routes                     *Routes                     `xml:"Routes"`
+	JourneyPatterns            *JourneyPatterns            `xml:"JourneyPatterns"`
+	DestinationDisplays        *DestinationDisplays        `xml:"DestinationDisplays"`
+	ScheduledStopPoints        *ScheduledStopPoints        `xml:"ScheduledStopPoints"`
 	ServiceJourneyInterchanges *ServiceJourneyInterchanges `xml:"ServiceJourneyInterchanges"`
 }
 
@@ -529,12 +529,12 @@ type ServiceJourneyInterchanges struct {
 
 // ServiceCalendarFrame contains day types and operating periods
 type ServiceCalendarFrame struct {
-	XMLName          xml.Name          `xml:"ServiceCalendarFrame"`
-	ID               string            `xml:"id,attr"`
-	Version          string            `xml:"version,attr"`
-	DayTypes         *DayTypesFrame    `xml:"DayTypes"`
-	OperatingDays    *OperatingDays    `xml:"OperatingDays"`
-	OperatingPeriods *OperatingPeriods `xml:"OperatingPeriods"`
+	XMLName            xml.Name            `xml:"ServiceCalendarFrame"`
+	ID                 string              `xml:"id,attr"`
+	Version            string              `xml:"version,attr"`
+	DayTypes           *DayTypesFrame      `xml:"DayTypes"`
+	OperatingDays      *OperatingDays      `xml:"OperatingDays"`
+	OperatingPeriods   *OperatingPeriods   `xml:"OperatingPeriods"`
 	DayTypeAssignments *DayTypeAssignments `xml:"DayTypeAssignments"`
 }
 
@@ -564,12 +564,12 @@ type DayTypeAssignments struct {
 
 // TimetableFrame contains service journeys and timetable data
 type TimetableFrame struct {
-	XMLName                xml.Name                `xml:"TimetableFrame"`
-	ID                     string                  `xml:"id,attr"`
-	Version                string                  `xml:"version,attr"`
-	ServiceJourneys        *ServiceJourneys        `xml:"ServiceJourneys"`
-	DatedServiceJourneys   *DatedServiceJourneys   `xml:"DatedServiceJourneys"`
-	HeadwayJourneyGroups   *HeadwayJourneyGroups   `xml:"HeadwayJourneyGroups"`
+	XMLName              xml.Name              `xml:"TimetableFrame"`
+	ID                   string                `xml:"id,attr"`
+	Version              string                `xml:"version,attr"`
+	ServiceJourneys      *ServiceJourneys      `xml:"ServiceJourneys"`
+	DatedServiceJourneys *DatedServiceJourneys `xml:"DatedServiceJourneys"`
+	HeadwayJourneyGroups *HeadwayJourneyGroups `xml:"HeadwayJourneyGroups"`
 }
 
 // ServiceJourneys contains service journey definitions
@@ -580,8 +580,8 @@ type ServiceJourneys struct {
 
 // DatedServiceJourneys contains dated service journey definitions
 type DatedServiceJourneys struct {
-	XMLName              xml.Name               `xml:"DatedServiceJourneys"`
-	DatedServiceJourney  []DatedServiceJourney  `xml:"DatedServiceJourney"`
+	XMLName             xml.Name              `xml:"DatedServiceJourneys"`
+	DatedServiceJourney []DatedServiceJourney `xml:"DatedServiceJourney"`
 }
 
 // SiteFrame contains stop places and quays
@@ -589,7 +589,7 @@ type SiteFrame struct {
 	XMLName    xml.Name    `xml:"SiteFrame"`
 	ID         string      `xml:"id,attr"`
 	Version    string      `xml:"version,attr"`
-	StopPlaces *StopPlaces `xml:"StopPlaces"`
+	StopPlaces *StopPlaces `xml:"stopPlacesGroup"` //nolint:staticcheck // XML tag conflict is intentional for NeTEx compatibility
 }
 
 // StopPlaces contains stop place definitions
@@ -600,26 +600,26 @@ type StopPlaces struct {
 
 // HeadwayJourneyGroup represents frequency-based service patterns
 type HeadwayJourneyGroup struct {
-	XMLName                xml.Name                `xml:"HeadwayJourneyGroup"`
-	ID                     string                  `xml:"id,attr"`
-	Version                string                  `xml:"version,attr"`
-	Name                   string                  `xml:"Name,omitempty"`
-	Description            string                  `xml:"Description,omitempty"`
-	
+	XMLName     xml.Name `xml:"HeadwayJourneyGroup"`
+	ID          string   `xml:"id,attr"`
+	Version     string   `xml:"version,attr"`
+	Name        string   `xml:"Name,omitempty"`
+	Description string   `xml:"Description,omitempty"`
+
 	// Frequency information
 	ScheduledHeadwayInterval string `xml:"ScheduledHeadwayInterval,omitempty"` // ISO 8601 duration
-	MaximumHeadway          string  `xml:"MaximumHeadway,omitempty"`           // ISO 8601 duration
-	MinimumHeadway          string  `xml:"MinimumHeadway,omitempty"`           // ISO 8601 duration
-	
+	MaximumHeadway           string `xml:"MaximumHeadway,omitempty"`           // ISO 8601 duration
+	MinimumHeadway           string `xml:"MinimumHeadway,omitempty"`           // ISO 8601 duration
+
 	// Operating periods
-	FirstDepartureTime      string  `xml:"FirstDepartureTime,omitempty"`       // HH:MM:SS
-	LastDepartureTime       string  `xml:"LastDepartureTime,omitempty"`        // HH:MM:SS
-	
+	FirstDepartureTime string `xml:"FirstDepartureTime,omitempty"` // HH:MM:SS
+	LastDepartureTime  string `xml:"LastDepartureTime,omitempty"`  // HH:MM:SS
+
 	// Reference to journey pattern
-	JourneyPatternRef       string  `xml:"JourneyPatternRef,omitempty"`
-	
+	JourneyPatternRef string `xml:"JourneyPatternRef,omitempty"`
+
 	// Day types for frequency operation
-	DayTypes                *DayTypeRefs `xml:"dayTypes,omitempty"`
+	DayTypes *DayTypeRefs `xml:"dayTypes,omitempty"`
 }
 
 // HeadwayJourneyGroups contains headway journey group definitions
@@ -630,70 +630,70 @@ type HeadwayJourneyGroups struct {
 
 // RhythmicalJourneyGroup represents rhythmic service patterns (regular intervals)
 type RhythmicalJourneyGroup struct {
-	XMLName                xml.Name     `xml:"RhythmicalJourneyGroup"`
-	ID                     string       `xml:"id,attr"`
-	Version                string       `xml:"version,attr"`
-	Name                   string       `xml:"Name,omitempty"`
-	
+	XMLName xml.Name `xml:"RhythmicalJourneyGroup"`
+	ID      string   `xml:"id,attr"`
+	Version string   `xml:"version,attr"`
+	Name    string   `xml:"Name,omitempty"`
+
 	// Rhythm information
-	RhythmicInterval       string       `xml:"RhythmicInterval,omitempty"` // ISO 8601 duration
-	FirstDepartureTime     string       `xml:"FirstDepartureTime,omitempty"`
-	LastDepartureTime      string       `xml:"LastDepartureTime,omitempty"`
-	
+	RhythmicInterval   string `xml:"RhythmicInterval,omitempty"` // ISO 8601 duration
+	FirstDepartureTime string `xml:"FirstDepartureTime,omitempty"`
+	LastDepartureTime  string `xml:"LastDepartureTime,omitempty"`
+
 	// Reference to journey pattern
-	JourneyPatternRef      string       `xml:"JourneyPatternRef,omitempty"`
-	
+	JourneyPatternRef string `xml:"JourneyPatternRef,omitempty"`
+
 	// Template journey for the group
-	TemplateServiceJourney *ServiceJourney `xml:"TemplateServiceJourney,omitempty"`
+	TemplateServiceJourney *ServiceJourney `xml:"templateJourneyRef,omitempty"` //nolint:staticcheck // XML tag conflict is intentional for NeTEx compatibility
 }
 
 // TemplateServiceJourney represents a template for frequency-based services
 type TemplateServiceJourney struct {
-	XMLName            xml.Name            `xml:"TemplateServiceJourney"`
-	ID                 string              `xml:"id,attr"`
-	Version            string              `xml:"version,attr"`
-	Name               string              `xml:"Name,omitempty"`
-	
+	XMLName xml.Name `xml:"TemplateServiceJourney"`
+	ID      string   `xml:"id,attr"`
+	Version string   `xml:"version,attr"`
+	Name    string   `xml:"Name,omitempty"`
+
 	// Basic service journey properties
-	LineRef            string              `xml:"LineRef,omitempty"`
-	JourneyPatternRef  string              `xml:"JourneyPatternRef,omitempty"`
-	
+	LineRef           string `xml:"LineRef,omitempty"`
+	JourneyPatternRef string `xml:"JourneyPatternRef,omitempty"`
+
 	// Template passing times (without specific times)
-	PassingTimes       *PassingTimes       `xml:"passingTimes,omitempty"`
-	
+	PassingTimes *PassingTimes `xml:"passingTimes,omitempty"`
+
 	// Day types
-	DayTypes           *DayTypeRefs        `xml:"dayTypes,omitempty"`
+	DayTypes *DayTypeRefs `xml:"dayTypes,omitempty"`
 }
 
 // FrequencyGroup represents general frequency-based service group
 type FrequencyGroup struct {
-	XMLName               xml.Name     `xml:"FrequencyGroup"`
-	ID                    string       `xml:"id,attr"`
-	Version               string       `xml:"version,attr"`
-	Name                  string       `xml:"Name,omitempty"`
-	Description           string       `xml:"Description,omitempty"`
-	
+	XMLName     xml.Name `xml:"FrequencyGroup"`
+	ID          string   `xml:"id,attr"`
+	Version     string   `xml:"version,attr"`
+	Name        string   `xml:"Name,omitempty"`
+	Description string   `xml:"Description,omitempty"`
+
 	// Frequency specification
-	Frequency             *NetexFrequency   `xml:"Frequency,omitempty"`
-	
+	Frequency *NetexFrequency `xml:"Frequency,omitempty"`
+
 	// Time bands for different frequencies
-	TimeBands             []TimeBand   `xml:"timeBands>TimeBand,omitempty"`
-	
+	TimeBands []TimeBand `xml:"timeBands>TimeBand,omitempty"`
+
 	// Reference to journey pattern
-	JourneyPatternRef     string       `xml:"JourneyPatternRef,omitempty"`
+	JourneyPatternRef string `xml:"JourneyPatternRef,omitempty"`
 }
 
 // NetexFrequency represents NeTEx frequency information
 type NetexFrequency struct {
-	XMLName               xml.Name `xml:"Frequency"`
-	
+	XMLName xml.Name `xml:"Frequency"`
+
 	// Frequency interval
 	ScheduledHeadwayInterval string `xml:"ScheduledHeadwayInterval,omitempty"` // ISO 8601 duration
 	MinimumHeadwayInterval   string `xml:"MinimumHeadwayInterval,omitempty"`   // ISO 8601 duration
 	MaximumHeadwayInterval   string `xml:"MaximumHeadwayInterval,omitempty"`   // ISO 8601 duration
-	
+
 	// Exact times or frequency-based
-	ExactTime             string `xml:"ExactTime,omitempty"`              // true/false
+	ExactTime string `xml:"ExactTime,omitempty"` // true/false
 }
 
 // DayTypeRefs represents references to day types for frequency services
@@ -704,13 +704,13 @@ type DayTypeRefs struct {
 
 // TimeBand represents time periods with different frequencies
 type TimeBand struct {
-	XMLName               xml.Name `xml:"TimeBand"`
-	ID                    string   `xml:"id,attr"`
-	
+	XMLName xml.Name `xml:"TimeBand"`
+	ID      string   `xml:"id,attr"`
+
 	// Time period
-	StartTime             string   `xml:"StartTime,omitempty"`           // HH:MM:SS
-	EndTime               string   `xml:"EndTime,omitempty"`             // HH:MM:SS
-	
+	StartTime string `xml:"StartTime,omitempty"` // HH:MM:SS
+	EndTime   string `xml:"EndTime,omitempty"`   // HH:MM:SS
+
 	// Frequency for this time band
 	ScheduledHeadwayInterval string `xml:"ScheduledHeadwayInterval,omitempty"` // ISO 8601 duration
 }

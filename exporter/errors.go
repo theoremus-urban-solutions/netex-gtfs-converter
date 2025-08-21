@@ -34,9 +34,9 @@ func (e ValidationError) Error() string {
 
 // ConversionError represents errors that occur during conversion
 type ConversionError struct {
-	Stage   string
+	Stage    string
 	EntityID string
-	Err     error
+	Err      error
 }
 
 func (e ConversionError) Error() string {

@@ -68,7 +68,10 @@ func (suite *MemoryBenchmarkSuite) benchmarkDefaultRepository() {
 	entities := createLargeNetexDataset(10000) // 10k entities
 
 	for _, entity := range entities {
-		repo.SaveEntity(entity)
+		if err := repo.SaveEntity(entity); err != nil {
+			// ignore in benchmark population
+			_ = err // Suppress unused variable warning
+		}
 	}
 
 	duration := time.Since(start)
@@ -101,10 +104,16 @@ func (suite *MemoryBenchmarkSuite) benchmarkOptimizedRepository() {
 
 	// Use batch processing
 	if optimizedRepo, ok := repo.(*repository.OptimizedNetexRepository); ok {
-		optimizedRepo.SaveEntitiesBatch(entities)
+		if err := optimizedRepo.SaveEntitiesBatch(entities); err != nil {
+			// ignore in benchmark population
+			_ = err // Suppress unused variable warning
+		}
 	} else {
 		for _, entity := range entities {
-			repo.SaveEntity(entity)
+			if err := repo.SaveEntity(entity); err != nil {
+				// ignore in benchmark population
+				_ = err // Suppress unused variable warning
+			}
 		}
 	}
 
@@ -149,7 +158,7 @@ func (suite *MemoryBenchmarkSuite) benchmarkSpecificBatchSize(batchSize int) {
 	entities := createLargeNetexDataset(10000)
 
 	processedCount := 0
-	batchProcessor.ProcessInBatches(entities, func(batch []interface{}) error {
+	_ = batchProcessor.ProcessInBatches(entities, func(batch []interface{}) error {
 		processedCount += len(batch)
 		return nil
 	})

@@ -153,16 +153,16 @@ func TestDefaultRouteProducer_Produce(t *testing.T) {
 		t.Errorf("Expected RouteID %s, got %s", line.ID, route.RouteID)
 	}
 
-	if route.RouteShortName != line.ShortName {
-		t.Errorf("Expected RouteShortName %s, got %s", line.ShortName, route.RouteShortName)
+	if route.RouteShortName != line.PublicCode {
+		t.Errorf("Expected RouteShortName %s, got %s", line.PublicCode, route.RouteShortName)
 	}
 
 	if route.RouteLongName != line.Name {
 		t.Errorf("Expected RouteLongName %s, got %s", line.Name, route.RouteLongName)
 	}
 
-	// Check route type mapping
-	expectedRouteType := model.LocalBusService.Value()
+	// Check route type mapping - should use basic GTFS types now
+	expectedRouteType := model.Bus.Value() // 3 instead of 704
 	if route.RouteType != expectedRouteType {
 		t.Errorf("Expected RouteType %d, got %d", expectedRouteType, route.RouteType)
 	}

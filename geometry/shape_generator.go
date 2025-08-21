@@ -340,13 +340,14 @@ func (sg *ShapeGenerator) perpendicularDistance(point, lineStart, lineEnd Point)
 
 	var xx, yy float64
 
-	if param < 0 {
+	switch {
+	case param < 0:
 		xx = lsx
 		yy = lsy
-	} else if param > 1 {
+	case param > 1:
 		xx = lex
 		yy = ley
-	} else {
+	default:
 		xx = lsx + param*C
 		yy = lsy + param*D
 	}

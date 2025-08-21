@@ -309,7 +309,7 @@ func (e *EnhancedGtfsExporter) convertAgenciesWithRecovery() error {
 				func() (interface{}, error) {
 					tz := e.netexRepository.GetTimeZone()
 					if tz == "" {
-						tz = "UTC"
+						tz = defaultTimezone
 					}
 					return tz, nil
 				})
@@ -553,11 +553,12 @@ func (e *EnhancedGtfsExporter) convertRoutesWithRecovery() error {
 		}
 
 		if route.RouteShortName == "" && route.RouteLongName == "" {
-			if line.ShortName != "" {
+			switch {
+			case line.ShortName != "":
 				route.RouteShortName = line.ShortName
-			} else if line.Name != "" {
+			case line.Name != "":
 				route.RouteLongName = line.Name
-			} else {
+			default:
 				route.RouteShortName = line.PublicCode
 			}
 		}

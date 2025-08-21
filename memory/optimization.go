@@ -25,7 +25,7 @@ func (mp *MemoryPool) GetPool(typeName string, newFunc func() interface{}) *sync
 	mp.mu.RLock()
 	pool, exists := mp.pools[typeName]
 	mp.mu.RUnlock()
-	
+
 	if !exists {
 		mp.mu.Lock()
 		// Double-check pattern
@@ -37,7 +37,7 @@ func (mp *MemoryPool) GetPool(typeName string, newFunc func() interface{}) *sync
 		}
 		mp.mu.Unlock()
 	}
-	
+
 	return pool
 }
 
@@ -56,7 +56,7 @@ type MemoryManager struct {
 func NewMemoryManager() *MemoryManager {
 	return &MemoryManager{
 		pool:               NewMemoryPool(),
-		gcInterval:         time.Minute * 2,  // GC every 2 minutes
+		gcInterval:         time.Minute * 2,   // GC every 2 minutes
 		memoryLimit:        500 * 1024 * 1024, // 500MB default limit
 		compressionEnabled: true,
 		batchSize:          1000, // Process in batches of 1000
@@ -95,10 +95,10 @@ func (mm *MemoryManager) GetBatchSize() int {
 func (mm *MemoryManager) CheckMemoryPressure() bool {
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
-	
+
 	// Read the limit without holding lock to avoid deadlock
 	limit := mm.getMemoryLimit()
-	
+
 	return memStats.Alloc > limit
 }
 
@@ -112,17 +112,17 @@ func (mm *MemoryManager) getMemoryLimit() uint64 {
 // ForceGC triggers garbage collection if needed
 func (mm *MemoryManager) ForceGC() {
 	now := time.Now()
-	
+
 	// Check conditions without holding lock to avoid deadlock
 	shouldGC := false
-	
+
 	mm.mu.Lock()
 	if now.Sub(mm.lastGC) > mm.gcInterval {
 		shouldGC = true
 		mm.lastGC = now
 	}
 	mm.mu.Unlock()
-	
+
 	// Check memory pressure separately (doesn't need lock)
 	if !shouldGC && mm.CheckMemoryPressure() {
 		shouldGC = true
@@ -130,7 +130,7 @@ func (mm *MemoryManager) ForceGC() {
 		mm.lastGC = now
 		mm.mu.Unlock()
 	}
-	
+
 	if shouldGC {
 		runtime.GC()
 		debug.FreeOSMemory() // Return memory to OS
@@ -141,31 +141,31 @@ func (mm *MemoryManager) ForceGC() {
 func (mm *MemoryManager) GetMemoryStats() MemoryStats {
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
-	
+
 	return MemoryStats{
-		AllocatedMB:    float64(memStats.Alloc) / (1024 * 1024),
-		TotalAllocMB:   float64(memStats.TotalAlloc) / (1024 * 1024),
-		SystemMB:       float64(memStats.Sys) / (1024 * 1024),
-		HeapAllocMB:    float64(memStats.HeapAlloc) / (1024 * 1024),
-		HeapSysMB:      float64(memStats.HeapSys) / (1024 * 1024),
-		StackInUseMB:   float64(memStats.StackInuse) / (1024 * 1024),
-		GCCycles:       memStats.NumGC,
-		LastGCTime:     time.Unix(0, int64(memStats.LastGC)),
-		GCCPUFraction:  memStats.GCCPUFraction,
+		AllocatedMB:   float64(memStats.Alloc) / (1024 * 1024),
+		TotalAllocMB:  float64(memStats.TotalAlloc) / (1024 * 1024),
+		SystemMB:      float64(memStats.Sys) / (1024 * 1024),
+		HeapAllocMB:   float64(memStats.HeapAlloc) / (1024 * 1024),
+		HeapSysMB:     float64(memStats.HeapSys) / (1024 * 1024),
+		StackInUseMB:  float64(memStats.StackInuse) / (1024 * 1024),
+		GCCycles:      memStats.NumGC,
+		LastGCTime:    time.Unix(0, int64(memStats.LastGC)), //nolint:gosec // intentional conversion of nanoseconds to int64
+		GCCPUFraction: memStats.GCCPUFraction,
 	}
 }
 
 // MemoryStats holds memory usage statistics
 type MemoryStats struct {
-	AllocatedMB    float64   `json:"allocated_mb"`
-	TotalAllocMB   float64   `json:"total_alloc_mb"`
-	SystemMB       float64   `json:"system_mb"`
-	HeapAllocMB    float64   `json:"heap_alloc_mb"`
-	HeapSysMB      float64   `json:"heap_sys_mb"`
-	StackInUseMB   float64   `json:"stack_inuse_mb"`
-	GCCycles       uint32    `json:"gc_cycles"`
-	LastGCTime     time.Time `json:"last_gc_time"`
-	GCCPUFraction  float64   `json:"gc_cpu_fraction"`
+	AllocatedMB   float64   `json:"allocated_mb"`
+	TotalAllocMB  float64   `json:"total_alloc_mb"`
+	SystemMB      float64   `json:"system_mb"`
+	HeapAllocMB   float64   `json:"heap_alloc_mb"`
+	HeapSysMB     float64   `json:"heap_sys_mb"`
+	StackInUseMB  float64   `json:"stack_inuse_mb"`
+	GCCycles      uint32    `json:"gc_cycles"`
+	LastGCTime    time.Time `json:"last_gc_time"`
+	GCCPUFraction float64   `json:"gc_cpu_fraction"`
 }
 
 // BatchProcessor provides memory-efficient batch processing
@@ -187,30 +187,30 @@ func (bp *BatchProcessor) ProcessInBatches(items []interface{}, processor func(b
 	if len(items) == 0 {
 		return nil
 	}
-	
+
 	for i := 0; i < len(items); i += bp.batchSize {
 		end := i + bp.batchSize
 		if end > len(items) {
 			end = len(items)
 		}
-		
+
 		batch := items[i:end]
-		
+
 		// Process batch
 		if err := processor(batch); err != nil {
 			return err
 		}
-		
+
 		// Check memory pressure and force GC if needed
 		bp.manager.ForceGC()
 	}
-	
+
 	return nil
 }
 
 // StreamProcessor processes items one at a time with memory management
 type StreamProcessor struct {
-	manager     *MemoryManager
+	manager        *MemoryManager
 	processedCount int
 	gcThreshold    int
 }
@@ -229,14 +229,14 @@ func (sp *StreamProcessor) ProcessItem(item interface{}, processor func(interfac
 	if err != nil {
 		return err
 	}
-	
+
 	sp.processedCount++
-	
+
 	// Periodic memory management
 	if sp.processedCount%sp.gcThreshold == 0 {
 		sp.manager.ForceGC()
 	}
-	
+
 	return nil
 }
 
@@ -276,13 +276,13 @@ func NewMemoryOptimizedBuffer(maxSize int) *MemoryOptimizedBuffer {
 func (mob *MemoryOptimizedBuffer) Write(data []byte) (int, error) {
 	mob.mu.Lock()
 	defer mob.mu.Unlock()
-	
+
 	// Check if buffer would exceed max size
 	if len(mob.buffer)+len(data) > mob.maxSize {
 		// Implement compression or chunking logic here
 		return 0, ErrBufferFull
 	}
-	
+
 	mob.buffer = append(mob.buffer, data...)
 	return len(data), nil
 }
@@ -291,7 +291,7 @@ func (mob *MemoryOptimizedBuffer) Write(data []byte) (int, error) {
 func (mob *MemoryOptimizedBuffer) Read() []byte {
 	mob.mu.RLock()
 	defer mob.mu.RUnlock()
-	
+
 	// Return copy to prevent external modification
 	result := make([]byte, len(mob.buffer))
 	copy(result, mob.buffer)
@@ -302,7 +302,7 @@ func (mob *MemoryOptimizedBuffer) Read() []byte {
 func (mob *MemoryOptimizedBuffer) Reset() {
 	mob.mu.Lock()
 	defer mob.mu.Unlock()
-	
+
 	mob.buffer = mob.buffer[:0] // Keep capacity, reset length
 	mob.compressed = false
 }
@@ -330,12 +330,12 @@ func (e *MemoryError) Error() string {
 
 // MemoryMonitor provides continuous memory monitoring
 type MemoryMonitor struct {
-	manager    *MemoryManager
-	interval   time.Duration
-	stopCh     chan struct{}
-	running    bool
-	mu         sync.Mutex
-	callbacks  []func(MemoryStats)
+	manager   *MemoryManager
+	interval  time.Duration
+	stopCh    chan struct{}
+	running   bool
+	mu        sync.Mutex
+	callbacks []func(MemoryStats)
 }
 
 // NewMemoryMonitor creates a new memory monitor
@@ -364,7 +364,7 @@ func (mm *MemoryMonitor) Start() {
 	}
 	mm.running = true
 	mm.mu.Unlock()
-	
+
 	go mm.monitor()
 }
 
@@ -377,31 +377,31 @@ func (mm *MemoryMonitor) Stop() {
 	}
 	mm.running = false
 	mm.mu.Unlock()
-	
+
 	close(mm.stopCh)
 }
 
 func (mm *MemoryMonitor) monitor() {
 	ticker := time.NewTicker(mm.interval)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ticker.C:
 			stats := mm.manager.GetMemoryStats()
-			
+
 			// Check for memory pressure
 			if mm.manager.CheckMemoryPressure() {
 				mm.manager.ForceGC()
 			}
-			
+
 			// Call callbacks
 			mm.mu.Lock()
 			for _, callback := range mm.callbacks {
 				callback(stats)
 			}
 			mm.mu.Unlock()
-			
+
 		case <-mm.stopCh:
 			return
 		}

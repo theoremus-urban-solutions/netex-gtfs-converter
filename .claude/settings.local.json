@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(tree:*)",
+      "Bash(go test:*)",
+      "Bash(go fmt:*)",
+      "Bash(golangci-lint run:*)",
+      "Bash(go vet:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

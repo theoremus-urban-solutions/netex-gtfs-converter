@@ -62,7 +62,7 @@ func TestDefaultGtfsExporter_ConvertStopsToGtfs(t *testing.T) {
 	// Read some data to verify it's a valid ZIP
 	buffer := make([]byte, 4)
 	n, err := result.Read(buffer)
-	if err != nil && err.Error() != "EOF" {
+	if err != nil && err.Error() != eofError {
 		t.Fatalf("Failed to read result: %v", err)
 	}
 

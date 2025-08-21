@@ -156,7 +156,10 @@ func (suite *BenchmarkSuite) profileMemoryUsage() {
 	entities := createLargeNetexDataset(5000)
 
 	for i, entity := range entities {
-		netexRepo.SaveEntity(entity)
+		if err := netexRepo.SaveEntity(entity); err != nil {
+			// ignore errors during profiling
+			_ = err // Suppress unused variable warning
+		}
 
 		// Sample memory usage at intervals
 		if i%1000 == 0 {

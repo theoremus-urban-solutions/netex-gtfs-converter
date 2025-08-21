@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"time"
@@ -74,7 +75,7 @@ func main() {
 		fmt.Printf("❌ Error opening ZIP file: %v\n", err)
 		return
 	}
-	defer zipReader.Close()
+	defer func() { _ = zipReader.Close() }()
 
 	// Find all XML files
 	var netexFiles []*zip.File
@@ -84,7 +85,7 @@ func main() {
 		fmt.Printf("   • %s (%.1f KB)\n", file.Name, float64(file.UncompressedSize64)/1024)
 		if filepath.Ext(file.Name) == ".xml" {
 			netexFiles = append(netexFiles, file)
-			totalSize += int64(file.UncompressedSize64)
+			totalSize = safeAddInt64(totalSize, file.UncompressedSize64)
 		}
 	}
 
@@ -132,7 +133,7 @@ func main() {
 			loadedFiles++
 		}
 
-		xmlReader.Close()
+		_ = xmlReader.Close()
 
 		// Monitor memory usage
 		memoryManager.CheckMemoryPressure()
@@ -251,12 +252,13 @@ func main() {
 	conversionStart := time.Now()
 
 	// Open NeTEx file for conversion
+	// #nosec G304 -- zipPath comes from a trusted CLI flag
 	file, err := os.Open(zipPath)
 	if err != nil {
 		fmt.Printf("❌ Error opening NeTEx file for conversion: %v\n", err)
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Convert to GTFS
 	fmt.Printf("Converting NeTEx to GTFS...\n")
@@ -272,7 +274,7 @@ func main() {
 		fmt.Printf("❌ Error creating output file: %v\n", err)
 		return
 	}
-	defer outputFile.Close()
+	defer func() { _ = outputFile.Close() }()
 
 	_, err = io.Copy(outputFile, gtfsReader)
 	if err != nil {
@@ -361,4 +363,24 @@ func main() {
 	fmt.Printf("\n🚀 === DEMONSTRATION COMPLETE ===\n")
 	fmt.Printf("Successfully processed French Grand Est regional transit data!\n")
 	fmt.Printf("The NeTEx to GTFS converter is ready for production use.\n")
+}
+
+// safeAddInt64 safely adds a signed int64 and an unsigned uint64, clamping at MaxInt64 on overflow
+func safeAddInt64(a int64, b uint64) int64 {
+	if a < 0 {
+		// Fallback: if a is negative, just convert b cautiously
+		//nolint:gosec // intentional overflow-safe conversion
+		if int64(b) < 0 { // impossible, but keep the branch explicit
+			return math.MinInt64
+		}
+		//nolint:gosec // intentional overflow check
+		if a+int64(b) < a { // overflow check
+			return math.MaxInt64
+		}
+		return a + int64(b) //nolint:gosec // intentional overflow-safe conversion
+	}
+	if b > uint64(math.MaxInt64)-uint64(a) {
+		return math.MaxInt64
+	}
+	return a + int64(b) //nolint:gosec // intentional overflow-safe conversion
 }

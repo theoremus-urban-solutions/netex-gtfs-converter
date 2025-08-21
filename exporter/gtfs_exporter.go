@@ -9,6 +9,10 @@ import (
 	"github.com/theoremus-urban-solutions/netex-gtfs-converter/repository"
 )
 
+const (
+	defaultTimezone = "UTC"
+)
+
 // GtfsExporter is the main interface for converting NeTEx datasets to GTFS
 type GtfsExporter interface {
 	// ConvertTimetablesToGtfs converts a NeTEx timetable dataset to GTFS format
@@ -377,9 +381,7 @@ func (e *DefaultGtfsExporter) convertServices() error {
 
 		// Trip headsign: from DestinationDisplay of first StopPoint in JP if present
 		var headsign string
-		if jp != nil && jp.PointsInSequence != nil {
-			// Not fully typed; keep empty unless DestinationDisplay is resolvable
-		}
+		// TODO: Implement headsign extraction from DestinationDisplay when available
 
 		// Build Trip
 		trip, err := e.tripProducer.Produce(producer.TripInput{
@@ -518,7 +520,7 @@ func (e *DefaultGtfsExporter) ensureDefaultAgency() error {
 	}
 	tz := e.netexRepository.GetTimeZone()
 	if tz == "" {
-		tz = "UTC"
+		tz = defaultTimezone
 	}
 	agency := &model.Agency{
 		AgencyID:       "default",

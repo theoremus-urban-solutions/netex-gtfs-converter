@@ -54,7 +54,7 @@ func TestDefaultNetexRepository(t *testing.T) {
 	// Test route association with line
 	route := &model.Route{
 		ID:      "test-route",
-		LineRef: "test-line",
+		LineRef: model.RouteLineRef{Ref: "test-line"},
 		Name:    "Test Route",
 	}
 

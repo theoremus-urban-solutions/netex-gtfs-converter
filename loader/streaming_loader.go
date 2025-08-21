@@ -7,7 +7,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"runtime"
 	"strings"
 	"sync"
@@ -51,7 +50,7 @@ func (l *StreamingNetexDatasetLoader) SetProgressCallback(callback func(filename
 // Load implements NetexDatasetLoader with streaming and memory optimization
 func (l *StreamingNetexDatasetLoader) Load(data io.Reader, repository producer.NetexRepository) error {
 	// Read all data into memory first (we need it for ZIP processing)
-	zipData, err := ioutil.ReadAll(data)
+	zipData, err := io.ReadAll(data)
 	if err != nil {
 		return fmt.Errorf("failed to read ZIP data: %w", err)
 	}
@@ -79,7 +78,12 @@ func (l *StreamingNetexDatasetLoader) loadFromZIPStreaming(zipData []byte, repos
 	for _, file := range zipReader.File {
 		if l.isXMLFile(file.Name) {
 			xmlFiles = append(xmlFiles, file)
-			totalSize += int64(file.UncompressedSize64)
+			// clamp addition to avoid overflow
+			if file.UncompressedSize64 > 0 && totalSize > (1<<63-1)-int64(minUint64(file.UncompressedSize64, ^uint64(0)>>1)) { //nolint:gosec // intentional overflow-safe conversion
+				totalSize = 1<<63 - 1
+			} else {
+				totalSize += int64(minUint64(file.UncompressedSize64, ^uint64(0)>>1)) //nolint:gosec // intentional overflow-safe conversion
+			}
 		}
 	}
 
@@ -114,7 +118,13 @@ func (l *StreamingNetexDatasetLoader) loadFromZIPStreaming(zipData []byte, repos
 
 			// Update progress
 			sizeMutex.Lock()
-			processedSize += int64(f.UncompressedSize64)
+			// clamp addition to avoid overflow
+			increment := int64(minUint64(f.UncompressedSize64, ^uint64(0)>>1)) //nolint:gosec // intentional overflow-safe conversion
+			if processedSize > (1<<63-1)-increment {
+				processedSize = 1<<63 - 1
+			} else {
+				processedSize += increment
+			}
 			if l.progressCallback != nil {
 				l.progressCallback(f.Name, processedSize, totalSize)
 			}
@@ -132,7 +142,7 @@ func (l *StreamingNetexDatasetLoader) processZIPFile(file *zip.File, repository 
 	if err != nil {
 		return err
 	}
-	defer rc.Close()
+	defer func() { _ = rc.Close() }()
 
 	return l.loadFromXMLStreaming(rc, repository, file.Name)
 }
@@ -320,7 +330,14 @@ func (l *StreamingNetexDatasetLoader) ForceGC() {
 	runtime.ReadMemStats(&m)
 
 	// Force GC if we're using more than the configured limit
-	if m.HeapInuse > uint64(l.maxMemoryMB)*1024*1024 {
+	if m.HeapInuse > uint64(l.maxMemoryMB)*1024*1024 { //nolint:gosec // intentional conversion for memory limit
 		runtime.GC()
 	}
+}
+
+func minUint64(a, b uint64) uint64 {
+	if a < b {
+		return a
+	}
+	return b
 }

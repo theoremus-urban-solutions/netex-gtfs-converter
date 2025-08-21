@@ -1,19 +1,22 @@
 # NeTEx to GTFS Converter (Go)
 
-A Go implementation of the NeTEx to GTFS converter, based on the [Java version](https://github.com/entur/netex-gtfs-converter-java).
+A high-performance Go implementation of the NeTEx to GTFS converter, providing efficient conversion of Network Timetable Exchange datasets into GTFS (General Transit Feed Specification) format.
 
 ## Overview
 
-This tool converts NeTEx (Network Timetable Exchange) datasets into GTFS (General Transit Feed Specification) format. It supports only European NeTEx profile.
+This tool converts NeTEx (Network Timetable Exchange) datasets into GTFS format with focus on European NeTEx profiles. It features comprehensive error handling, memory optimization, and extensible architecture.
 
 ## Features
 
-- **Multiple Profile Support**: European
-- **Flexible Configuration**: Profile-aware conversion with configurable requirements
-- **Extensible Architecture**: Producer pattern for easy customization
+- **European NeTEx Profile Support**: Specialized handling of European transit data standards
+- **Performance Optimized**: Memory-efficient processing with streaming capabilities  
+- **Extensible Architecture**: Producer pattern for easy customization and extension
 - **Comprehensive Route Type Mapping**: Full support for GTFS extended route types
-- **CLI Interface**: Easy-to-use command-line tool
-- **Stop-Only Conversion**: Convert only stop data without timetable information
+- **Robust Error Handling**: Recovery mechanisms and detailed validation reporting
+- **CLI Interface**: Feature-rich command-line tool with multiple output options
+- **Advanced Stop Time Production**: Enhanced algorithms for accurate timetable conversion
+- **Calendar Management**: Sophisticated service calendar generation and holiday detection
+- **Geometry Processing**: Shape generation and spatial data handling
 
 ## Installation
 
@@ -21,12 +24,28 @@ This tool converts NeTEx (Network Timetable Exchange) datasets into GTFS (Genera
 
 - Go 1.21 or later
 
-### Build from Source
+### Quick Install
 
 ```bash
-git clone <repository-url>
-cd github.com/theoremus-urban-solutions/netex-gtfs-converter
-go build -o converter/converter converter/main.go
+# Clone the repository
+git clone https://github.com/theoremus-urban-solutions/netex-gtfs-converter
+cd netex-gtfs-converter
+
+# Build using Make
+make build
+
+# Or install directly
+make install
+```
+
+### Development Setup
+
+```bash
+# Install development tools
+make dev-tools
+
+# Run development checks
+make dev
 ```
 
 ## Usage
@@ -34,14 +53,17 @@ go build -o converter/converter converter/main.go
 ### Basic Usage
 
 ```bash
-# Convert full timetable data
-./converter/converter --codespace FR --netex data.zip --output gtfs.zip
+# Using the built binary
+./bin/netex-gtfs-converter --codespace FR --netex data.zip --output gtfs.zip
 
 # Convert only stops
-./converter/converter --stops stops.zip --stops-only --output stops-only.zip
+./bin/netex-gtfs-converter --stops stops.zip --stops-only --output stops-only.zip
 
 # Example with French data
-./converter/converter --netex fluo-grand-est-riv-netex.zip --codespace FR --output /tmp/gtfs.zip
+./bin/netex-gtfs-converter --netex fluo-grand-est-riv-netex.zip --codespace FR --output /tmp/gtfs.zip
+
+# Using installed binary
+netex-gtfs-converter --help
 ```
 
 ### Command Line Options
@@ -157,95 +179,150 @@ exporter.SetAgencyProducer(&CustomAgencyProducer{})
 github.com/theoremus-urban-solutions/netex-gtfs-converter/
 ├── cmd/
 │   └── converter/
-│       └── main.go              # CLI entry point
-├── internal/
-│   ├── config/
-│   │   └── profile_config.go    # Profile configuration
-│   ├── exporter/
-│   │   ├── gtfs_exporter.go     # Main exporter interface
-│   │   └── errors.go            # Error definitions
-│   ├── model/
-│   │   ├── netex_models.go      # NeTEx data structures
-│   │   ├── gtfs_models.go       # GTFS data structures
-│   │   └── route_types.go       # Route type mapping
-│   ├── producer/
-│   │   └── producer.go          # Producer interfaces
-│   ├── repository/
-│   │   ├── netex_repository.go  # NeTEx data access
-│   │   └── gtfs_repository.go   # GTFS data access
-│   ├── loader/
-│   │   └── netex_loader.go      # NeTEx data loading
-│   ├── serializer/
-│   │   └── gtfs_serializer.go   # GTFS serialization
-│   └── util/
-│       └── geometry.go          # Geometry utilities
-├── pkg/
-│   ├── utils/
-│   └── validation/
+│       ├── main.go              # CLI entry point
+│       └── main_test.go         # CLI tests
+├── benchmark/                   # Performance benchmarks
+├── calendar/                    # Calendar and service management
+├── config/                      # Configuration handling
+├── exporter/                    # GTFS export functionality
+├── geometry/                    # Spatial processing
+├── loader/                      # NeTEx data loading
+├── memory/                      # Memory optimization
+├── model/                       # Data models and structures
+├── producer/                    # Data transformation producers  
+├── repository/                  # Data access layer
+├── validation/                  # Data validation
 ├── testdata/                    # Test data files
+├── docs/                        # Generated documentation
+├── examples/                    # Usage examples
 ├── go.mod
+├── Makefile                     # Build automation
 └── README.md
+```
+
+### Available Make Targets
+
+```bash
+# Development
+make dev-tools          # Install development tools
+make build              # Build the CLI binary
+make install            # Install the CLI binary
+make dev                # Quick development check
+
+# Testing & Quality
+make test               # Run all tests
+make test-verbose       # Run tests with verbose output
+make benchmark          # Run performance benchmarks
+make coverage           # Generate test coverage report
+make lint               # Run linter
+make validate           # Run all validation checks
+
+# Build & Release
+make build-all          # Build for all platforms
+make release-prep       # Prepare for release
+make clean              # Clean build artifacts
+
+# Documentation
+make docs               # Generate documentation
+make docs-serve         # Start documentation server
+make stats              # Show project statistics
 ```
 
 ### Building
 
 ```bash
-# Build the converter
-go build -o converter cmd/converter/main.go
+# Quick build
+make build
 
-# Run tests
-go test ./...
+# Build for all platforms
+make build-all
 
-# Build for different platforms
-GOOS=linux GOARCH=amd64 go build -o converter-linux cmd/converter/main.go
-GOOS=windows GOARCH=amd64 go build -o converter.exe cmd/converter/main.go
+# Manual build
+go build -o bin/netex-gtfs-converter ./cmd/converter
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-go test ./...
+make test
 
 # Run tests with coverage
-go test -cover ./...
+make coverage
 
-# Run specific test
-go test ./exporter
+# Run benchmarks
+make benchmark
+
+# Run specific package tests
+go test ./calendar
+go test ./producer
 ```
 
-## Comparison with Java Version
+## Performance & Optimization
 
-This Go implementation maintains compatibility with the Java version while providing:
+This Go implementation provides significant performance improvements:
 
-- **Better Performance**: Go's efficient memory management and concurrency
-- **Simpler Deployment**: Single binary, no JVM required
-- **Profile Flexibility**: More configurable profile handling
-- **Modern Architecture**: Clean interfaces and dependency injection
+- **Memory Efficiency**: Advanced memory optimization with streaming processing
+- **Concurrent Processing**: Parallel data transformation and validation
+- **Single Binary Deployment**: No runtime dependencies or JVM required
+- **Comprehensive Benchmarking**: Built-in performance monitoring and profiling
+- **Optimized Data Structures**: Custom repositories for efficient data access
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Install development tools (`make dev-tools`)
+4. Make your changes following the existing code style
+5. Add tests for new functionality
+6. Run validation checks (`make validate`)
+7. Run benchmarks to ensure performance (`make benchmark`)
+8. Commit your changes (`git commit -m 'Add amazing feature'`)
+9. Push to the branch (`git push origin feature/amazing-feature`)
+10. Submit a pull request
+
+### Development Workflow
+
+```bash
+# Setup development environment
+make dev-tools
+
+# Make changes and test
+make dev
+
+# Full validation before PR
+make check
+```
+
+## Documentation
+
+Generate and view comprehensive documentation:
+
+```bash
+# Generate API documentation
+make docs
+
+# Serve documentation locally
+make docs-serve
+# Visit: http://localhost:6060/pkg/github.com/theoremus-urban-solutions/netex-gtfs-converter/
+
+# View project statistics
+make stats
+```
+
+Generated documentation includes:
+- API reference for all packages
+- Package documentation  
+- HTML documentation (if godoc is available)
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes, new features, and bug fixes.
 
 ## License
 
-This project is licensed under the same license as the original Java version.
+This project is licensed under the same terms as the original Java implementation.
 
 ## Acknowledgments
 
-This implementation is based on the excellent work of the [Entur team](https://github.com/entur/netex-gtfs-converter-java) and their Java NeTEx to GTFS converter.
-
-
-
-
-
-
-
-
-
-
+This Go implementation builds upon the excellent foundation provided by the [Entur team](https://github.com/entur/netex-gtfs-converter-java) and their Java NeTEx to GTFS converter. We extend our gratitude for their pioneering work in transit data standardization.

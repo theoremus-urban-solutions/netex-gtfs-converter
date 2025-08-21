@@ -6,6 +6,12 @@ import (
 	"github.com/theoremus-urban-solutions/netex-gtfs-converter/model"
 )
 
+const (
+	busBay1ID     = "bus_bay_1"
+	accessible1ID = "accessible_1"
+	accessible2ID = "accessible_2"
+)
+
 func TestSophisticatedInterchangeProducer_ProduceComplexInterchanges(t *testing.T) {
 	mockNetexRepo := &mockNetexRepository{}
 	mockGtfsRepo := &mockGtfsRepository{}
@@ -104,13 +110,13 @@ func TestSophisticatedInterchangeProducer_ProduceComplexInterchanges(t *testing.
 		}
 
 		// Check for mode transfers (e.g., train to bus)
-		if (transfer.FromStopID == "train_platform_1" && transfer.ToStopID == "bus_bay_1") ||
-			(transfer.FromStopID == "bus_bay_1" && transfer.ToStopID == "train_platform_1") {
+		if (transfer.FromStopID == "train_platform_1" && transfer.ToStopID == busBay1ID) ||
+			(transfer.FromStopID == busBay1ID && transfer.ToStopID == "train_platform_1") {
 			hasModeTransfer = true
 		}
 
 		// Check for accessibility transfers
-		if transfer.FromStopID == "bus_bay_1" || transfer.ToStopID == "bus_bay_1" {
+		if transfer.FromStopID == busBay1ID || transfer.ToStopID == busBay1ID {
 			hasAccessibilityTransfer = true
 		}
 	}
@@ -239,8 +245,8 @@ func TestSophisticatedInterchangeProducer_AccessibilityTransfers(t *testing.T) {
 	hasFallbackTransfer := false
 
 	for _, transfer := range transfers {
-		if (transfer.FromStopID == "accessible_1" && transfer.ToStopID == "accessible_2") ||
-			(transfer.FromStopID == "accessible_2" && transfer.ToStopID == "accessible_1") {
+		if (transfer.FromStopID == accessible1ID && transfer.ToStopID == accessible2ID) ||
+			(transfer.FromStopID == accessible2ID && transfer.ToStopID == accessible1ID) {
 			hasAccessibleTransfer = true
 			if transfer.TransferType != 0 { // Should be recommended
 				t.Error("Accessible transfers should be recommended type")

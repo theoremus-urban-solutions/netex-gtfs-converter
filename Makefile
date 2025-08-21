@@ -141,12 +141,17 @@ clean: ## Clean build artifacts
 clean-all: clean deps-clean ## Clean everything including caches
 
 # Documentation
-docs: ## Generate documentation
+docs: .FORCE ## Generate documentation
 	@echo "Generating documentation..."
 	@mkdir -p docs/api
-	@$(GO) doc -all . > docs/api.txt
 	@echo "Generating package documentation..."
-	@$(GO) doc . > docs/package.txt
+	@for pkg in $$($(GO) list ./...); do \
+		echo "=== Package: $$pkg ===" >> docs/api.txt; \
+		$(GO) doc -all $$pkg >> docs/api.txt 2>/dev/null || true; \
+		echo "" >> docs/api.txt; \
+	done
+	@echo "Generating main package documentation..."
+	@$(GO) doc -all ./cmd/converter > docs/package.txt 2>/dev/null || echo "No main package documentation available" > docs/package.txt
 	@echo "Generating HTML documentation (if godoc is available)..."
 	@which godoc >/dev/null 2>&1 && (godoc -http=:6060 & sleep 3 && curl -s http://localhost:6060/pkg/github.com/theoremus-urban-solutions/netex-gtfs-converter/ > docs/api/index.html && pkill -f "godoc -http=:6060") || echo "godoc not found - skipping HTML generation"
 	@echo "Documentation generated:"
@@ -181,6 +186,13 @@ version: ## Show version information
 	@echo "Version: $(VERSION)"
 	@echo "Go version: $(shell $(GO) version)"
 	@echo "Git commit: $(shell git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
+
+changelog: ## Show unreleased changes for changelog
+	@echo "=== Unreleased Changes ==="
+	@echo "Changes since last release:"
+	@git log --oneline --no-merges $(shell git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD 2>/dev/null || echo "No previous tags found"
+	@echo ""
+	@echo "Add these to CHANGELOG.md under [Unreleased] section"
 
 # Examples
 example-basic: build ## Run basic example

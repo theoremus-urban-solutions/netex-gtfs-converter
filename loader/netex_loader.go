@@ -6,7 +6,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"github.com/theoremus-urban-solutions/netex-gtfs-converter/model"
@@ -24,7 +23,7 @@ func NewDefaultNetexDatasetLoader() producer.NetexDatasetLoader {
 // Load loads NeTEx data from a reader (ZIP archive) into the repository
 func (l *DefaultNetexDatasetLoader) Load(data io.Reader, repository producer.NetexRepository) error {
 	// Read all data into memory
-	zipData, err := ioutil.ReadAll(data)
+	zipData, err := io.ReadAll(data)
 	if err != nil {
 		return fmt.Errorf("failed to read ZIP data: %w", err)
 	}
@@ -48,8 +47,8 @@ func (l *DefaultNetexDatasetLoader) Load(data io.Reader, repository producer.Net
 		}
 
 		// Read file content
-		xmlData, err := ioutil.ReadAll(rc)
-		rc.Close()
+		xmlData, err := io.ReadAll(rc)
+		_ = rc.Close()
 		if err != nil {
 			return fmt.Errorf("failed to read file %s: %w", file.Name, err)
 		}

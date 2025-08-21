@@ -177,6 +177,12 @@ const (
 
 // MapNetexToGtfsRouteType converts NeTEx transport mode and submode to GTFS route type
 func MapNetexToGtfsRouteType(mode, submode string) RouteType {
+	return MapNetexToGtfsRouteTypeWithConfig(mode, submode, false)
+}
+
+// MapNetexToGtfsRouteTypeWithConfig converts NeTEx transport mode and submode to GTFS route type
+// with option to use basic GTFS types for compatibility
+func MapNetexToGtfsRouteTypeWithConfig(mode, submode string, useBasicTypes bool) RouteType {
 	switch mode {
 	case "air":
 		switch submode {
@@ -190,6 +196,10 @@ func MapNetexToGtfsRouteType(mode, submode string) RouteType {
 			return AirService
 		}
 	case "bus":
+		if useBasicTypes {
+			// Use basic GTFS route type for maximum compatibility
+			return Bus
+		}
 		switch submode {
 		case "airportLinkBus":
 			return BusService
@@ -291,6 +301,9 @@ func MapNetexToGtfsRouteType(mode, submode string) RouteType {
 			return WaterTransportService
 		}
 	default:
+		if useBasicTypes {
+			return Bus // basic GTFS bus type for compatibility
+		}
 		return BusService // default fallback
 	}
 }

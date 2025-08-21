@@ -220,7 +220,7 @@ func (r *OptimizedGtfsRepository) OptimizeStopTimes() {
 	}
 
 	// Force GC to clean up temporary maps
-	tripStopTimes = nil
+	_ = tripStopTimes // Suppress unused variable warning
 	runtime.GC()
 }
 
@@ -294,7 +294,7 @@ func (r *OptimizedGtfsRepository) StreamWriteStopTimes(writer func([]*model.Stop
 	}
 
 	batchProcessor := memory.NewBatchProcessor(r.memoryManager)
-	batchProcessor.ProcessInBatches(make([]interface{}, len(r.stopTimes)), func(batch []interface{}) error {
+	if err := batchProcessor.ProcessInBatches(make([]interface{}, len(r.stopTimes)), func(batch []interface{}) error {
 		start := len(batch) * (batchSize)
 		end := start + len(batch)
 		if end > len(r.stopTimes) {
@@ -306,7 +306,9 @@ func (r *OptimizedGtfsRepository) StreamWriteStopTimes(writer func([]*model.Stop
 			return writer(batchStopTimes)
 		}
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
 
 	return nil
 }

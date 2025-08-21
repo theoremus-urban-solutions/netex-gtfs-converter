@@ -51,7 +51,7 @@ func (v ValidationLevel) String() string {
 	case ValidationDetailed:
 		return "Detailed"
 	default:
-		return "Unknown"
+		return unknownPatternType
 	}
 }
 

@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strings"
 
 	"github.com/theoremus-urban-solutions/netex-gtfs-converter/model"
@@ -68,8 +68,8 @@ func (r *DefaultStopAreaRepository) LoadStopAreas(data []byte) error {
 		}
 
 		// Read file content
-		xmlData, err := ioutil.ReadAll(rc)
-		rc.Close()
+		xmlData, err := io.ReadAll(rc)
+		_ = rc.Close()
 		if err != nil {
 			return fmt.Errorf("failed to read file %s: %w", file.Name, err)
 		}

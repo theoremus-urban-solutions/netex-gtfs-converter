@@ -43,7 +43,7 @@ func (p *EnhancedStopTimeProducer) ProduceStopTimesForTrip(serviceJourney *model
 		CurrentHeadSign: headsign,
 	}
 
-	stopTimes, err := p.AdvancedStopTimeProducer.ProduceAdvanced(input)
+	stopTimes, err := p.ProduceAdvanced(input)
 	if err != nil {
 		return nil, err
 	}
@@ -126,12 +126,13 @@ func (p *EnhancedStopTimeProducer) applyEuropeanPickupDropoffRules(stopTime *mod
 	totalStops := len(journeyPattern.PointsInSequence.PointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern)
 
 	// Apply rules based on stop position
-	if stopIndex == 0 {
+	switch stopIndex {
+	case 0:
 		// First stop - no drop-off typically
 		if stopTime.DropOffType == "0" {
 			stopTime.DropOffType = "1" // No drop-off available
 		}
-	} else if stopIndex == totalStops-1 {
+	case totalStops - 1:
 		// Last stop - no pickup typically
 		if stopTime.PickupType == "0" {
 			stopTime.PickupType = "1" // No pickup available
@@ -234,7 +235,8 @@ func (p *EnhancedStopTimeProducer) interpolateWithEuropeanRules(stopTimes []*mod
 	// Calculate interpolated time with European constraints
 	var arrivalSeconds, departureSeconds int
 
-	if prevIndex >= 0 && nextIndex >= 0 {
+	switch {
+	case prevIndex >= 0 && nextIndex >= 0:
 		// Interpolate between two known points
 		prevTime := p.parseGTFSTime(getLastKnownTime(stopTimes[prevIndex]))
 		nextTime := p.parseGTFSTime(getFirstKnownTime(stopTimes[nextIndex]))
@@ -259,7 +261,7 @@ func (p *EnhancedStopTimeProducer) interpolateWithEuropeanRules(stopTimes []*mod
 			arrivalSeconds = interpolatedTime
 			departureSeconds = interpolatedTime + stopTime
 		}
-	} else if prevIndex >= 0 {
+	case prevIndex >= 0:
 		// Extrapolate forward
 		prevTime := p.parseGTFSTime(getLastKnownTime(stopTimes[prevIndex]))
 		if prevTime > 0 {
@@ -268,7 +270,7 @@ func (p *EnhancedStopTimeProducer) interpolateWithEuropeanRules(stopTimes []*mod
 			arrivalSeconds = prevTime + travelTime
 			departureSeconds = arrivalSeconds + constraints.MinStopTime
 		}
-	} else if nextIndex >= 0 {
+	case nextIndex >= 0:
 		// Extrapolate backward
 		nextTime := p.parseGTFSTime(getFirstKnownTime(stopTimes[nextIndex]))
 		if nextTime > 0 {

@@ -20,17 +20,17 @@ func TestAdvancedStopTimeProducer_TimeInterpolation(t *testing.T) {
 	// Create test service journey with partial times
 	serviceJourney := &model.ServiceJourney{
 		ID:                "sj1",
-		JourneyPatternRef: "jp1",
+		JourneyPatternRef: model.ServiceJourneyPatternRef{Ref: "jp1"},
 		PassingTimes: &model.PassingTimes{
 			TimetabledPassingTime: []model.TimetabledPassingTime{
 				{
 					PointInJourneyPatternRef: "stop1",
-					DepartureTime:            timePtr("08:00:00"),
+					DepartureTime:            "08:00:00",
 				},
 				// stop2 has no time - should be interpolated
 				{
 					PointInJourneyPatternRef: "stop3",
-					ArrivalTime:              timePtr("08:10:00"),
+					ArrivalTime:              "08:10:00",
 				},
 			},
 		},
@@ -94,21 +94,21 @@ func TestAdvancedStopTimeProducer_ShapeDistanceCalculation(t *testing.T) {
 
 	serviceJourney := &model.ServiceJourney{
 		ID:                "sj1",
-		JourneyPatternRef: "jp1",
+		JourneyPatternRef: model.ServiceJourneyPatternRef{Ref: "jp1"},
 		PassingTimes: &model.PassingTimes{
 			TimetabledPassingTime: []model.TimetabledPassingTime{
 				{
 					PointInJourneyPatternRef: "stop1",
-					DepartureTime:            timePtr("08:00:00"),
+					DepartureTime:            "08:00:00",
 				},
 				{
 					PointInJourneyPatternRef: "stop2",
-					ArrivalTime:              timePtr("08:05:00"),
-					DepartureTime:            timePtr("08:05:30"),
+					ArrivalTime:              "08:05:00",
+					DepartureTime:            "08:05:30",
 				},
 				{
 					PointInJourneyPatternRef: "stop3",
-					ArrivalTime:              timePtr("08:10:00"),
+					ArrivalTime:              "08:10:00",
 				},
 			},
 		},
@@ -155,12 +155,12 @@ func TestAdvancedStopTimeProducer_ExtrapolationForward(t *testing.T) {
 	// Only first stop has time - others should be extrapolated
 	serviceJourney := &model.ServiceJourney{
 		ID:                "sj1",
-		JourneyPatternRef: "jp1",
+		JourneyPatternRef: model.ServiceJourneyPatternRef{Ref: "jp1"},
 		PassingTimes: &model.PassingTimes{
 			TimetabledPassingTime: []model.TimetabledPassingTime{
 				{
 					PointInJourneyPatternRef: "stop1",
-					DepartureTime:            timePtr("08:00:00"),
+					DepartureTime:            "08:00:00",
 				},
 			},
 		},
@@ -218,12 +218,12 @@ func TestAdvancedStopTimeProducer_ExtrapolationBackward(t *testing.T) {
 	// Only last stop has time - others should be extrapolated backward
 	serviceJourney := &model.ServiceJourney{
 		ID:                "sj1",
-		JourneyPatternRef: "jp1",
+		JourneyPatternRef: model.ServiceJourneyPatternRef{Ref: "jp1"},
 		PassingTimes: &model.PassingTimes{
 			TimetabledPassingTime: []model.TimetabledPassingTime{
 				{
 					PointInJourneyPatternRef: "stop3",
-					ArrivalTime:              timePtr("08:10:00"),
+					ArrivalTime:              "08:10:00",
 				},
 			},
 		},
@@ -374,6 +374,9 @@ func createTestJourneyPattern() *model.JourneyPattern {
 	}
 }
 
+// timePtr is a helper function for creating time pointers in tests
+//
+//nolint:unused // This function is used in test scenarios
 func timePtr(timeStr string) *time.Time {
 	t, _ := time.Parse("15:04:05", timeStr)
 	return &t

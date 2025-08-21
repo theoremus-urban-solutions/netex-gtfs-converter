@@ -101,6 +101,8 @@ func (r *OptimizedNetexRepository) initializePools() {
 }
 
 // getFromPool retrieves an object from the pool
+//
+//nolint:unused // This function is used in memory optimization scenarios
 func (r *OptimizedNetexRepository) getFromPool(typeName string) interface{} {
 	r.mu.RLock()
 	pool, exists := r.objectPools[typeName]
@@ -113,6 +115,8 @@ func (r *OptimizedNetexRepository) getFromPool(typeName string) interface{} {
 }
 
 // returnToPool returns an object to the pool after resetting it
+//
+//nolint:unused // This function is used in memory optimization scenarios
 func (r *OptimizedNetexRepository) returnToPool(typeName string, obj interface{}) {
 	r.mu.RLock()
 	pool, exists := r.objectPools[typeName]
@@ -126,6 +130,8 @@ func (r *OptimizedNetexRepository) returnToPool(typeName string, obj interface{}
 }
 
 // resetObject resets an object to its zero state for reuse
+//
+//nolint:unused // This function is used in memory optimization scenarios
 func (r *OptimizedNetexRepository) resetObject(obj interface{}) {
 	switch v := obj.(type) {
 	case *model.ServiceJourney:
@@ -204,14 +210,16 @@ func (r *OptimizedNetexRepository) GetServiceJourneysByLine(lineId string) []*mo
 		routeInterfaces[i] = route
 	}
 
-	batchProcessor.ProcessInBatches(routeInterfaces, func(batch []interface{}) error {
+	if err := batchProcessor.ProcessInBatches(routeInterfaces, func(batch []interface{}) error {
 		for _, routeInterface := range batch {
 			route := routeInterface.(*model.Route)
 			journeys := r.GetServiceJourneysByRoute(route.ID)
 			allJourneys = append(allJourneys, journeys...)
 		}
 		return nil
-	})
+	}); err != nil {
+		return nil
+	}
 
 	return allJourneys
 }

@@ -8,6 +8,11 @@ import (
 	"github.com/theoremus-urban-solutions/netex-gtfs-converter/model"
 )
 
+const (
+	unknownPatternType = "Unknown"
+	defaultTimezone    = "Europe/Oslo"
+)
+
 // CalendarManager handles complex European transit calendar patterns
 type CalendarManager struct {
 	calendars        map[string]*model.Calendar
@@ -79,7 +84,7 @@ func (t ServicePatternType) String() string {
 	case PatternReplacementService:
 		return "ReplacementService"
 	default:
-		return "Unknown"
+		return unknownPatternType
 	}
 }
 
@@ -112,7 +117,7 @@ func (t ExceptionType) String() string {
 	case ExceptionReplaced:
 		return "Replaced"
 	default:
-		return "Unknown"
+		return unknownPatternType
 	}
 }
 
@@ -151,7 +156,7 @@ func (s Season) String() string {
 	case SeasonSchoolHoliday:
 		return "SchoolHoliday"
 	default:
-		return "Unknown"
+		return unknownPatternType
 	}
 }
 
@@ -269,7 +274,7 @@ func NewCalendarManager(config CalendarConfig) *CalendarManager {
 		config.HolidayCountryCode = "NO" // Default to Norway for European NeTEx
 	}
 	if config.TimezoneName == "" {
-		config.TimezoneName = "Europe/Oslo"
+		config.TimezoneName = defaultTimezone
 	}
 	if config.MaxServiceExceptions == 0 {
 		config.MaxServiceExceptions = 500
@@ -629,10 +634,8 @@ func (cm *CalendarManager) ValidateServicePattern(pattern *ServicePattern) []str
 
 	if pattern.ValidityPeriod == nil {
 		issues = append(issues, "Service pattern missing validity period")
-	} else {
-		if pattern.ValidityPeriod.StartDate.After(pattern.ValidityPeriod.EndDate) {
-			issues = append(issues, "Service pattern start date is after end date")
-		}
+	} else if pattern.ValidityPeriod.StartDate.After(pattern.ValidityPeriod.EndDate) {
+		issues = append(issues, "Service pattern start date is after end date")
 	}
 
 	if len(pattern.OperatingDays) == 0 && len(pattern.Exceptions) == 0 {

@@ -498,6 +498,7 @@ func TestValidator_MaxIssuesPerType(t *testing.T) {
 func TestValidator_SeverityThreshold(t *testing.T) {
 	config := ValidationConfig{
 		SeverityThreshold: SeverityError,
+		MaxIssuesPerType:  100, // Ensure this doesn't limit our test
 	}
 
 	validator := NewValidator()

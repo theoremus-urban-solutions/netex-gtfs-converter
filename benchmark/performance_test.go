@@ -137,7 +137,9 @@ func BenchmarkMemoryUsage(b *testing.B) {
 		entities := createLargeNetexDataset(1000)
 
 		for _, entity := range entities {
-			netexRepo.SaveEntity(entity)
+			if err := netexRepo.SaveEntity(entity); err != nil {
+				b.Fatal(err)
+			}
 		}
 
 		// Force garbage collection periodically
@@ -199,7 +201,9 @@ func BenchmarkLargeDatasetProcessing(b *testing.B) {
 				entities := createLargeNetexDataset(size)
 
 				for _, entity := range entities {
-					netexRepo.SaveEntity(entity)
+					if err := netexRepo.SaveEntity(entity); err != nil {
+						b.Fatal(err)
+					}
 				}
 			}
 

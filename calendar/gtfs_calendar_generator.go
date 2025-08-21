@@ -349,17 +349,9 @@ func (gcg *GTFSCalendarGenerator) minimizeCalendarDates(calendarDates []*model.C
 		calendarServiceIDs[calendar.ServiceID] = true
 	}
 
-	result := make([]*model.CalendarDate, 0)
-	for _, date := range calendarDates {
-		// If service has a calendar.txt entry, only keep exceptions
-		if calendarServiceIDs[date.ServiceID] {
-			// Only keep if it's an exception (removal or special addition)
-			result = append(result, date)
-		} else {
-			// Keep all dates for services without calendar.txt entries
-			result = append(result, date)
-		}
-	}
+	// Keep all calendar dates - the logic is the same regardless of calendar.txt presence
+	result := make([]*model.CalendarDate, 0, len(calendarDates))
+	result = append(result, calendarDates...)
 
 	return result
 }

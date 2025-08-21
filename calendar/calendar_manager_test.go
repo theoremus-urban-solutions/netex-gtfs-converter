@@ -18,6 +18,7 @@ func TestNewCalendarManager(t *testing.T) {
 
 	if manager == nil {
 		t.Error("Expected non-nil calendar manager")
+		return
 	}
 
 	if manager.config.HolidayCountryCode != "NO" {
@@ -48,6 +49,7 @@ func TestAddServicePattern(t *testing.T) {
 	retrieved := manager.GetServicePattern("test_pattern")
 	if retrieved == nil {
 		t.Error("Expected to retrieve added service pattern")
+		return
 	}
 
 	if retrieved.ID != "test_pattern" {

@@ -28,13 +28,13 @@ type Reporter struct {
 
 // ReporterConfig controls report generation behavior
 type ReporterConfig struct {
-	IncludeProcessingStats bool                   `json:"include_processing_stats"`
-	IncludeDetailedIssues  bool                   `json:"include_detailed_issues"`
-	GroupBySeverity        bool                   `json:"group_by_severity"`
-	GroupByEntityType      bool                   `json:"group_by_entity_type"`
-	MaxIssuesPerGroup      int                    `json:"max_issues_per_group"`
-	SeverityFilter         []ValidationSeverity  `json:"severity_filter"`
-	EntityTypeFilter       []string              `json:"entity_type_filter"`
+	IncludeProcessingStats bool                 `json:"include_processing_stats"`
+	IncludeDetailedIssues  bool                 `json:"include_detailed_issues"`
+	GroupBySeverity        bool                 `json:"group_by_severity"`
+	GroupByEntityType      bool                 `json:"group_by_entity_type"`
+	MaxIssuesPerGroup      int                  `json:"max_issues_per_group"`
+	SeverityFilter         []ValidationSeverity `json:"severity_filter"`
+	EntityTypeFilter       []string             `json:"entity_type_filter"`
 }
 
 // NewReporter creates a new reporter with default configuration
@@ -48,7 +48,7 @@ func NewReporter() *Reporter {
 		SeverityFilter:         []ValidationSeverity{SeverityInfo, SeverityWarning, SeverityError, SeverityCritical},
 		EntityTypeFilter:       []string{}, // Empty means include all
 	}
-	
+
 	return &Reporter{config: config}
 }
 
@@ -61,7 +61,7 @@ func (r *Reporter) SetConfig(config ReporterConfig) {
 func (r *Reporter) GenerateReport(report ValidationReport, format ReportFormat, writer io.Writer) error {
 	// Filter report based on configuration
 	filteredReport := r.filterReport(report)
-	
+
 	switch format {
 	case FormatJSON:
 		return r.generateJSONReport(filteredReport, writer)
@@ -81,25 +81,25 @@ func (r *Reporter) GenerateReport(report ValidationReport, format ReportFormat, 
 // filterReport applies configuration filters to the report
 func (r *Reporter) filterReport(report ValidationReport) ValidationReport {
 	filteredIssues := make([]ValidationIssue, 0)
-	
+
 	for _, issue := range report.Issues {
 		// Filter by severity
 		if !r.containsSeverity(issue.Severity) {
 			continue
 		}
-		
+
 		// Filter by entity type
 		if len(r.config.EntityTypeFilter) > 0 && !r.containsEntityType(issue.EntityType) {
 			continue
 		}
-		
+
 		filteredIssues = append(filteredIssues, issue)
 	}
-	
+
 	// Update summary with filtered data
 	report.Issues = filteredIssues
 	report.Summary = r.generateFilteredSummary(filteredIssues)
-	
+
 	return report
 }
 
@@ -134,17 +134,17 @@ func (r *Reporter) generateFilteredSummary(issues []ValidationIssue) ValidationS
 		HasCritical:  false,
 		HasErrors:    false,
 	}
-	
+
 	for _, issue := range issues {
 		summary.BySeverity[issue.Severity]++
 		summary.ByEntityType[issue.EntityType]++
-		
+
 		// Extract category from issue code
 		parts := strings.Split(issue.Code, "_")
 		if len(parts) > 0 {
 			summary.ByCategory[parts[0]]++
 		}
-		
+
 		// Update validation status
 		if issue.Severity == SeverityCritical {
 			summary.HasCritical = true
@@ -155,7 +155,7 @@ func (r *Reporter) generateFilteredSummary(issues []ValidationIssue) ValidationS
 			summary.IsValid = false
 		}
 	}
-	
+
 	return summary
 }
 
@@ -166,48 +166,92 @@ func (r *Reporter) generateJSONReport(report ValidationReport, writer io.Writer)
 	return encoder.Encode(report)
 }
 
+// writef is a helper function to handle fmt.Fprintf errors
+func (r *Reporter) writef(writer io.Writer, format string, args ...interface{}) error {
+	_, err := fmt.Fprintf(writer, format, args...)
+	return err
+}
+
 // generateTextReport generates a plain text format report
 func (r *Reporter) generateTextReport(report ValidationReport, writer io.Writer) error {
 	// Write header
-	fmt.Fprintf(writer, "=== NeTEx to GTFS Validation Report ===\n")
-	fmt.Fprintf(writer, "Generated: %s\n", report.Timestamp.Format(time.RFC3339))
-	fmt.Fprintf(writer, "\n")
-	
+	if err := r.writef(writer, "=== NeTEx to GTFS Validation Report ===\n"); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "Generated: %s\n", report.Timestamp.Format(time.RFC3339)); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "\n"); err != nil {
+		return err
+	}
+
 	// Write summary
-	fmt.Fprintf(writer, "=== SUMMARY ===\n")
-	fmt.Fprintf(writer, "Total Issues: %d\n", report.Summary.TotalIssues)
-	fmt.Fprintf(writer, "Validation Status: %s\n", r.getValidationStatusText(report.Summary))
-	fmt.Fprintf(writer, "\n")
-	
+	if err := r.writef(writer, "=== SUMMARY ===\n"); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "Total Issues: %d\n", report.Summary.TotalIssues); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "Validation Status: %s\n", r.getValidationStatusText(report.Summary)); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "\n"); err != nil {
+		return err
+	}
+
 	// Write severity breakdown
-	fmt.Fprintf(writer, "Issues by Severity:\n")
+	if err := r.writef(writer, "Issues by Severity:\n"); err != nil {
+		return err
+	}
 	severities := []ValidationSeverity{SeverityCritical, SeverityError, SeverityWarning, SeverityInfo}
 	for _, severity := range severities {
 		if count, exists := report.Summary.BySeverity[severity]; exists && count > 0 {
-			fmt.Fprintf(writer, "  %s: %d\n", severity.String(), count)
+			if err := r.writef(writer, "  %s: %d\n", severity.String(), count); err != nil {
+				return err
+			}
 		}
 	}
-	fmt.Fprintf(writer, "\n")
-	
+	if err := r.writef(writer, "\n"); err != nil {
+		return err
+	}
+
 	// Write entity type breakdown
 	if len(report.Summary.ByEntityType) > 0 {
-		fmt.Fprintf(writer, "Issues by Entity Type:\n")
-		for entityType, count := range report.Summary.ByEntityType {
-			fmt.Fprintf(writer, "  %s: %d\n", entityType, count)
+		if err := r.writef(writer, "Issues by Entity Type:\n"); err != nil {
+			return err
 		}
-		fmt.Fprintf(writer, "\n")
+		for entityType, count := range report.Summary.ByEntityType {
+			if err := r.writef(writer, "  %s: %d\n", entityType, count); err != nil {
+				return err
+			}
+		}
+		if err := r.writef(writer, "\n"); err != nil {
+			return err
+		}
 	}
-	
+
 	// Write processing statistics
 	if r.config.IncludeProcessingStats {
-		fmt.Fprintf(writer, "=== PROCESSING STATISTICS ===\n")
-		fmt.Fprintf(writer, "Overall Conversion Rate: %.2f%%\n", report.ProcessingStats.ConversionRate)
-		fmt.Fprintf(writer, "Processing Duration: %v\n", report.ProcessingStats.ProcessingDuration)
-		fmt.Fprintf(writer, "Memory Usage: %.2f MB\n", report.ProcessingStats.MemoryUsageMB)
-		fmt.Fprintf(writer, "\n")
-		
+		if err := r.writef(writer, "=== PROCESSING STATISTICS ===\n"); err != nil {
+			return err
+		}
+		if err := r.writef(writer, "Overall Conversion Rate: %.2f%%\n", report.ProcessingStats.ConversionRate); err != nil {
+			return err
+		}
+		if err := r.writef(writer, "Processing Duration: %v\n", report.ProcessingStats.ProcessingDuration); err != nil {
+			return err
+		}
+		if err := r.writef(writer, "Memory Usage: %.2f MB\n", report.ProcessingStats.MemoryUsageMB); err != nil {
+			return err
+		}
+		if err := r.writef(writer, "\n"); err != nil {
+			return err
+		}
+
 		if len(report.ProcessingStats.EntitiesProcessed) > 0 {
-			fmt.Fprintf(writer, "Entity Processing Details:\n")
+			if err := r.writef(writer, "Entity Processing Details:\n"); err != nil {
+				return err
+			}
 			for entityType, processed := range report.ProcessingStats.EntitiesProcessed {
 				converted := report.ProcessingStats.EntitiesConverted[entityType]
 				skipped := report.ProcessingStats.EntitiesSkipped[entityType]
@@ -215,50 +259,57 @@ func (r *Reporter) generateTextReport(report ValidationReport, writer io.Writer)
 				if processed > 0 {
 					rate = float64(converted) / float64(processed) * 100
 				}
-				fmt.Fprintf(writer, "  %s: %d processed, %d converted, %d skipped (%.1f%% success)\n",
-					entityType, processed, converted, skipped, rate)
+				if err := r.writef(writer, "  %s: %d processed, %d converted, %d skipped (%.1f%% success)\n",
+					entityType, processed, converted, skipped, rate); err != nil {
+					return err
+				}
 			}
-			fmt.Fprintf(writer, "\n")
+			if err := r.writef(writer, "\n"); err != nil {
+				return err
+			}
 		}
 	}
-	
+
 	// Write detailed issues
 	if r.config.IncludeDetailedIssues && len(report.Issues) > 0 {
-		fmt.Fprintf(writer, "=== DETAILED ISSUES ===\n")
-		
-		if r.config.GroupBySeverity {
+		if err := r.writef(writer, "=== DETAILED ISSUES ===\n"); err != nil {
+			return err
+		}
+
+		switch {
+		case r.config.GroupBySeverity:
 			r.writeGroupedIssues(writer, report.Issues, func(issue ValidationIssue) string {
 				return issue.Severity.String()
 			})
-		} else if r.config.GroupByEntityType {
+		case r.config.GroupByEntityType:
 			r.writeGroupedIssues(writer, report.Issues, func(issue ValidationIssue) string {
 				return issue.EntityType
 			})
-		} else {
+		default:
 			r.writeIssuesList(writer, report.Issues, "All Issues")
 		}
 	}
-	
+
 	return nil
 }
 
 // writeGroupedIssues writes issues grouped by a key function
 func (r *Reporter) writeGroupedIssues(writer io.Writer, issues []ValidationIssue, keyFunc func(ValidationIssue) string) {
 	groups := make(map[string][]ValidationIssue)
-	
+
 	// Group issues
 	for _, issue := range issues {
 		key := keyFunc(issue)
 		groups[key] = append(groups[key], issue)
 	}
-	
+
 	// Sort group keys
 	keys := make([]string, 0, len(groups))
 	for key := range groups {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
-	
+
 	// Write each group
 	for _, key := range keys {
 		groupIssues := groups[key]
@@ -268,45 +319,67 @@ func (r *Reporter) writeGroupedIssues(writer io.Writer, issues []ValidationIssue
 
 // writeIssuesList writes a list of issues under a heading
 func (r *Reporter) writeIssuesList(writer io.Writer, issues []ValidationIssue, heading string) {
-	fmt.Fprintf(writer, "\n--- %s (%d issues) ---\n", heading, len(issues))
-	
+	if err := r.writef(writer, "\n--- %s (%d issues) ---\n", heading, len(issues)); err != nil {
+		return
+	}
+
 	// Limit issues per group if configured
 	displayIssues := issues
 	if r.config.MaxIssuesPerGroup > 0 && len(issues) > r.config.MaxIssuesPerGroup {
 		displayIssues = issues[:r.config.MaxIssuesPerGroup]
-		fmt.Fprintf(writer, "(Showing first %d of %d issues)\n", r.config.MaxIssuesPerGroup, len(issues))
+		if err := r.writef(writer, "(Showing first %d of %d issues)\n", r.config.MaxIssuesPerGroup, len(issues)); err != nil {
+			return
+		}
 	}
-	
+
 	for i, issue := range displayIssues {
-		fmt.Fprintf(writer, "\n%d. [%s] %s\n", i+1, issue.Severity.String(), issue.Message)
-		
+		if err := r.writef(writer, "\n%d. [%s] %s\n", i+1, issue.Severity.String(), issue.Message); err != nil {
+			return
+		}
+
 		if issue.EntityID != "" {
-			fmt.Fprintf(writer, "   Entity: %s (%s)\n", issue.EntityID, issue.EntityType)
-		}
-		
-		if issue.Field != "" {
-			fmt.Fprintf(writer, "   Field: %s", issue.Field)
-			if issue.Value != "" {
-				fmt.Fprintf(writer, " = '%s'", issue.Value)
+			if err := r.writef(writer, "   Entity: %s (%s)\n", issue.EntityID, issue.EntityType); err != nil {
+				return
 			}
-			fmt.Fprintf(writer, "\n")
 		}
-		
+
+		if issue.Field != "" {
+			if err := r.writef(writer, "   Field: %s", issue.Field); err != nil {
+				return
+			}
+			if issue.Value != "" {
+				if err := r.writef(writer, " = '%s'", issue.Value); err != nil {
+					return
+				}
+			}
+			if err := r.writef(writer, "\n"); err != nil {
+				return
+			}
+		}
+
 		if issue.Suggestion != "" {
-			fmt.Fprintf(writer, "   Suggestion: %s\n", issue.Suggestion)
+			if err := r.writef(writer, "   Suggestion: %s\n", issue.Suggestion); err != nil {
+				return
+			}
 		}
-		
+
 		if issue.Location != "" {
-			fmt.Fprintf(writer, "   Location: %s\n", issue.Location)
+			if err := r.writef(writer, "   Location: %s\n", issue.Location); err != nil {
+				return
+			}
 		}
-		
+
 		if len(issue.Context) > 0 {
-			fmt.Fprintf(writer, "   Context: ")
+			if err := r.writef(writer, "   Context: "); err != nil {
+				return
+			}
 			contextPairs := make([]string, 0, len(issue.Context))
 			for k, v := range issue.Context {
 				contextPairs = append(contextPairs, fmt.Sprintf("%s=%s", k, v))
 			}
-			fmt.Fprintf(writer, "%s\n", strings.Join(contextPairs, ", "))
+			if err := r.writef(writer, "%s\n", strings.Join(contextPairs, ", ")); err != nil {
+				return
+			}
 		}
 	}
 }
@@ -314,7 +387,7 @@ func (r *Reporter) writeIssuesList(writer io.Writer, issues []ValidationIssue, h
 // generateHTMLReport generates an HTML format report
 func (r *Reporter) generateHTMLReport(report ValidationReport, writer io.Writer) error {
 	tmpl := template.Must(template.New("report").Parse(htmlTemplate))
-	
+
 	data := struct {
 		Report      ValidationReport
 		Config      ReporterConfig
@@ -324,79 +397,125 @@ func (r *Reporter) generateHTMLReport(report ValidationReport, writer io.Writer)
 		Config:      r.config,
 		GeneratedAt: time.Now().Format("2006-01-02 15:04:05"),
 	}
-	
+
 	return tmpl.Execute(writer, data)
 }
 
 // generateMarkdownReport generates a Markdown format report
 func (r *Reporter) generateMarkdownReport(report ValidationReport, writer io.Writer) error {
 	// Write header
-	fmt.Fprintf(writer, "# NeTEx to GTFS Validation Report\n\n")
-	fmt.Fprintf(writer, "**Generated:** %s\n\n", report.Timestamp.Format(time.RFC3339))
-	
+	if err := r.writef(writer, "# NeTEx to GTFS Validation Report\n\n"); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "**Generated:** %s\n\n", report.Timestamp.Format(time.RFC3339)); err != nil {
+		return err
+	}
+
 	// Write summary
-	fmt.Fprintf(writer, "## Summary\n\n")
-	fmt.Fprintf(writer, "- **Total Issues:** %d\n", report.Summary.TotalIssues)
-	fmt.Fprintf(writer, "- **Validation Status:** %s\n", r.getValidationStatusText(report.Summary))
-	fmt.Fprintf(writer, "- **Conversion Rate:** %.2f%%\n\n", report.ProcessingStats.ConversionRate)
-	
+	if err := r.writef(writer, "## Summary\n\n"); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "- **Total Issues:** %d\n", report.Summary.TotalIssues); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "- **Validation Status:** %s\n", r.getValidationStatusText(report.Summary)); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "- **Conversion Rate:** %.2f%%\n\n", report.ProcessingStats.ConversionRate); err != nil {
+		return err
+	}
+
 	// Write severity breakdown table
-	fmt.Fprintf(writer, "### Issues by Severity\n\n")
-	fmt.Fprintf(writer, "| Severity | Count |\n")
-	fmt.Fprintf(writer, "|----------|-------|\n")
+	if err := r.writef(writer, "### Issues by Severity\n\n"); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "| Severity | Count |\n"); err != nil {
+		return err
+	}
+	if err := r.writef(writer, "|----------|-------|\n"); err != nil {
+		return err
+	}
 	severities := []ValidationSeverity{SeverityCritical, SeverityError, SeverityWarning, SeverityInfo}
 	for _, severity := range severities {
 		if count, exists := report.Summary.BySeverity[severity]; exists {
-			fmt.Fprintf(writer, "| %s | %d |\n", severity.String(), count)
+			if err := r.writef(writer, "| %s | %d |\n", severity.String(), count); err != nil {
+				return err
+			}
 		}
 	}
-	fmt.Fprintf(writer, "\n")
-	
+	if err := r.writef(writer, "\n"); err != nil {
+		return err
+	}
+
 	// Write detailed issues
 	if r.config.IncludeDetailedIssues && len(report.Issues) > 0 {
-		fmt.Fprintf(writer, "## Detailed Issues\n\n")
-		
+		if err := r.writef(writer, "## Detailed Issues\n\n"); err != nil {
+			return err
+		}
+
 		for i, issue := range report.Issues {
 			if r.config.MaxIssuesPerGroup > 0 && i >= r.config.MaxIssuesPerGroup {
-				fmt.Fprintf(writer, "*...and %d more issues*\n", len(report.Issues)-i)
+				if err := r.writef(writer, "*...and %d more issues*\n", len(report.Issues)-i); err != nil {
+					return err
+				}
 				break
 			}
-			
-			fmt.Fprintf(writer, "### %d. %s\n\n", i+1, issue.Message)
-			fmt.Fprintf(writer, "- **Severity:** %s\n", issue.Severity.String())
-			fmt.Fprintf(writer, "- **Code:** %s\n", issue.Code)
-			
+
+			if err := r.writef(writer, "### %d. %s\n\n", i+1, issue.Message); err != nil {
+				return err
+			}
+			if err := r.writef(writer, "- **Severity:** %s\n", issue.Severity.String()); err != nil {
+				return err
+			}
+			if err := r.writef(writer, "- **Code:** %s\n", issue.Code); err != nil {
+				return err
+			}
+
 			if issue.EntityID != "" {
-				fmt.Fprintf(writer, "- **Entity:** %s (%s)\n", issue.EntityID, issue.EntityType)
-			}
-			
-			if issue.Field != "" {
-				fmt.Fprintf(writer, "- **Field:** %s", issue.Field)
-				if issue.Value != "" {
-					fmt.Fprintf(writer, " = `%s`", issue.Value)
+				if err := r.writef(writer, "- **Entity:** %s (%s)\n", issue.EntityID, issue.EntityType); err != nil {
+					return err
 				}
-				fmt.Fprintf(writer, "\n")
 			}
-			
+
+			if issue.Field != "" {
+				if err := r.writef(writer, "- **Field:** %s", issue.Field); err != nil {
+					return err
+				}
+				if issue.Value != "" {
+					if err := r.writef(writer, " = `%s`", issue.Value); err != nil {
+						return err
+					}
+				}
+				if err := r.writef(writer, "\n"); err != nil {
+					return err
+				}
+			}
+
 			if issue.Suggestion != "" {
-				fmt.Fprintf(writer, "- **Suggestion:** %s\n", issue.Suggestion)
+				if err := r.writef(writer, "- **Suggestion:** %s\n", issue.Suggestion); err != nil {
+					return err
+				}
 			}
-			
-			fmt.Fprintf(writer, "\n")
+
+			if err := r.writef(writer, "\n"); err != nil {
+				return err
+			}
 		}
 	}
-	
+
 	return nil
 }
 
 // generateCSVReport generates a CSV format report
 func (r *Reporter) generateCSVReport(report ValidationReport, writer io.Writer) error {
 	// Write CSV header
-	fmt.Fprintf(writer, "Severity,Code,Message,EntityType,EntityID,Field,Value,Suggestion,Location\n")
-	
+	if err := r.writef(writer, "Severity,Code,Message,EntityType,EntityID,Field,Value,Suggestion,Location\n"); err != nil {
+		return err
+	}
+
 	// Write issues
 	for _, issue := range report.Issues {
-		fmt.Fprintf(writer, "%s,%s,\"%s\",%s,%s,%s,\"%s\",\"%s\",%s\n",
+		if err := r.writef(writer, "%s,%s,\"%s\",%s,%s,%s,\"%s\",\"%s\",%s\n",
 			issue.Severity.String(),
 			issue.Code,
 			strings.ReplaceAll(issue.Message, "\"", "\"\""), // Escape quotes
@@ -406,9 +525,11 @@ func (r *Reporter) generateCSVReport(report ValidationReport, writer io.Writer) 
 			strings.ReplaceAll(issue.Value, "\"", "\"\""),
 			strings.ReplaceAll(issue.Suggestion, "\"", "\"\""),
 			issue.Location,
-		)
+		); err != nil {
+			return err
+		}
 	}
-	
+
 	return nil
 }
 

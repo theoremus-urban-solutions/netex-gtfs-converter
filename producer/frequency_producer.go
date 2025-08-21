@@ -349,9 +349,7 @@ func (p *DefaultFrequencyProducer) CreateFrequencyBasedService(group *model.Head
 	}
 
 	// Create GTFS route (if needed)
-	var route *model.GtfsRoute
-	// In practice, this would use a route producer
-	route = &model.GtfsRoute{
+	route := &model.GtfsRoute{
 		RouteID:        line.ID,
 		RouteShortName: line.ShortName,
 		RouteLongName:  line.Name,

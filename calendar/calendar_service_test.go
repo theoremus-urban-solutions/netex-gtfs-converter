@@ -6,9 +6,13 @@ import (
 	"time"
 )
 
+const (
+	testTimezone = "Europe/Oslo"
+)
+
 func TestNewCalendarService(t *testing.T) {
 	config := CalendarServiceConfig{
-		DefaultTimezoneName:     "Europe/Oslo",
+		DefaultTimezoneName:    testTimezone,
 		HolidayCountryCode:     "NO",
 		EnableHolidayDetection: true,
 		ValidationLevel:        ValidationStandard,
@@ -21,10 +25,11 @@ func TestNewCalendarService(t *testing.T) {
 
 	if service == nil {
 		t.Error("Expected non-nil calendar service")
+		return
 	}
 
-	if service.config.DefaultTimezoneName != "Europe/Oslo" {
-		t.Errorf("Expected timezone Europe/Oslo, got %s", service.config.DefaultTimezoneName)
+	if service.config.DefaultTimezoneName != testTimezone {
+		t.Errorf("Expected timezone %s, got %s", testTimezone, service.config.DefaultTimezoneName)
 	}
 }
 
@@ -37,8 +42,8 @@ func TestCalendarServiceDefaults(t *testing.T) {
 	}
 
 	// Check defaults
-	if service.config.DefaultTimezoneName != "Europe/Oslo" {
-		t.Errorf("Expected default timezone Europe/Oslo, got %s", service.config.DefaultTimezoneName)
+	if service.config.DefaultTimezoneName != testTimezone {
+		t.Errorf("Expected default timezone %s, got %s", testTimezone, service.config.DefaultTimezoneName)
 	}
 
 	if service.config.HolidayCountryCode != "NO" {
@@ -128,7 +133,9 @@ func TestConvertNeTExToGTFS(t *testing.T) {
 		HolidayBehavior: HolidayAsWeekday,
 	}
 
-	service.AddCustomServicePattern(weekdayPattern)
+	if err := service.AddCustomServicePattern(weekdayPattern); err != nil {
+		t.Fatal(err)
+	}
 
 	// Convert to GTFS
 	result, err := service.ConvertNeTExToGTFS(nil)
@@ -138,6 +145,7 @@ func TestConvertNeTExToGTFS(t *testing.T) {
 
 	if result == nil {
 		t.Error("Expected non-nil conversion result")
+		return
 	}
 
 	if len(result.Calendars) == 0 {
@@ -166,14 +174,16 @@ func TestGetServiceDates(t *testing.T) {
 		Type: PatternRegular,
 		ValidityPeriod: &ValidityPeriod{
 			StartDate: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), // Monday
-			EndDate:   time.Date(2024, 1, 7, 0, 0, 0, 0, time.UTC),  // Sunday
+			EndDate:   time.Date(2024, 1, 7, 0, 0, 0, 0, time.UTC), // Sunday
 		},
 		OperatingDays: []time.Weekday{time.Monday, time.Wednesday, time.Friday},
 		Exceptions:    make([]*ServiceException, 0),
 		SpecialDays:   make(map[string]*SpecialDay),
 	}
 
-	service.AddCustomServicePattern(pattern)
+	if err := service.AddCustomServicePattern(pattern); err != nil {
+		t.Fatal(err)
+	}
 
 	startDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2024, 1, 7, 0, 0, 0, 0, time.UTC)
@@ -226,7 +236,9 @@ func TestIsServiceOperating(t *testing.T) {
 		SpecialDays: make(map[string]*SpecialDay),
 	}
 
-	service.AddCustomServicePattern(pattern)
+	if err := service.AddCustomServicePattern(pattern); err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []struct {
 		name     string
@@ -280,7 +292,7 @@ func TestValidateConfiguration(t *testing.T) {
 			name: "valid config",
 			config: CalendarServiceConfig{
 				DefaultTimezoneName:  "Europe/Oslo",
-				HolidayCountryCode:  "NO",
+				HolidayCountryCode:   "NO",
 				MaxServiceExceptions: 100,
 			},
 			expectedIssues: 0,
@@ -289,7 +301,7 @@ func TestValidateConfiguration(t *testing.T) {
 			name: "invalid timezone",
 			config: CalendarServiceConfig{
 				DefaultTimezoneName:  "Invalid/Timezone",
-				HolidayCountryCode:  "NO",
+				HolidayCountryCode:   "NO",
 				MaxServiceExceptions: 100,
 			},
 			expectedIssues: 1,
@@ -298,7 +310,7 @@ func TestValidateConfiguration(t *testing.T) {
 			name: "invalid country code",
 			config: CalendarServiceConfig{
 				DefaultTimezoneName:  "Europe/Oslo",
-				HolidayCountryCode:  "INVALID",
+				HolidayCountryCode:   "INVALID",
 				MaxServiceExceptions: 100,
 			},
 			expectedIssues: 1,
@@ -307,7 +319,7 @@ func TestValidateConfiguration(t *testing.T) {
 			name: "negative max exceptions",
 			config: CalendarServiceConfig{
 				DefaultTimezoneName:  "Europe/Oslo",
-				HolidayCountryCode:  "NO",
+				HolidayCountryCode:   "NO",
 				MaxServiceExceptions: -1,
 			},
 			expectedIssues: 1,
@@ -330,7 +342,7 @@ func TestValidateConfiguration(t *testing.T) {
 func TestGetHolidays(t *testing.T) {
 	config := CalendarServiceConfig{
 		EnableHolidayDetection: true,
-		HolidayCountryCode:    "NO",
+		HolidayCountryCode:     "NO",
 	}
 	service, _ := NewCalendarService(config)
 
@@ -386,7 +398,9 @@ func TestConversionWithOptimizations(t *testing.T) {
 			SpecialDays:     make(map[string]*SpecialDay),
 			HolidayBehavior: HolidayAsWeekday,
 		}
-		service.AddCustomServicePattern(pattern)
+		if err := service.AddCustomServicePattern(pattern); err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	result, err := service.ConvertNeTExToGTFS(nil)
@@ -420,10 +434,15 @@ func TestGetConversionSummary(t *testing.T) {
 		HolidayBehavior: HolidayAsWeekday,
 	}
 
-	service.AddCustomServicePattern(pattern)
+	if err := service.AddCustomServicePattern(pattern); err != nil {
+		t.Fatal(err)
+	}
 
 	// Generate GTFS to populate internal structures
-	service.ConvertNeTExToGTFS(nil)
+	_, err := service.ConvertNeTExToGTFS(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	summary := service.GetConversionSummary()
 

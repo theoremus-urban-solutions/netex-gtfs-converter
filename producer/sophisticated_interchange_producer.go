@@ -558,11 +558,12 @@ func (p *SophisticatedInterchangeProducer) calculateStationComplexity(stopPlace 
 		quayCount := len(stopPlace.Quays.Quay)
 
 		// More quays = more complex
-		if quayCount > 10 {
+		switch {
+		case quayCount > 10:
 			complexity += 0.3
-		} else if quayCount > 5 {
+		case quayCount > 5:
 			complexity += 0.2
-		} else if quayCount > 2 {
+		case quayCount > 2:
 			complexity += 0.1
 		}
 	}
