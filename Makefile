@@ -151,7 +151,7 @@ docs: .FORCE ## Generate documentation
 		echo "" >> docs/api.txt; \
 	done
 	@echo "Generating main package documentation..."
-	@$(GO) doc -all ./cmd/converter > docs/package.txt 2>/dev/null || echo "No main package documentation available" > docs/package.txt
+	@$(GO) doc -all ./cmd/netex-gtfs-converter > docs/package.txt 2>/dev/null || echo "No main package documentation available" > docs/package.txt
 	@echo "Generating HTML documentation (if godoc is available)..."
 	@which godoc >/dev/null 2>&1 && (godoc -http=:6060 & sleep 3 && curl -s http://localhost:6060/pkg/github.com/theoremus-urban-solutions/netex-gtfs-converter/ > docs/api/index.html && pkill -f "godoc -http=:6060") || echo "godoc not found - skipping HTML generation"
 	@echo "Documentation generated:"

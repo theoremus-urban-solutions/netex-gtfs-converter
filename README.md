@@ -238,7 +238,7 @@ make build
 make build-all
 
 # Manual build
-go build -o bin/netex-gtfs-converter ./cmd/converter
+go build -o bin/netex-gtfs-converter ./cmd/netex-gtfs-converter
 ```
 
 ### Testing
