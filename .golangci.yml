@@ -23,21 +23,6 @@ formatters:
     - gofmt
     - goimports
 
-linters-settings:
-  gosec:
-    # Exclude test files from certain security checks
-    excludes:
-      - G204 # Subprocess launched with variable - acceptable in tests
-      - G304 # Potential file inclusion via variable - acceptable in tests
-
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  # Exclude gosec entirely from test files
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gosec
-    - path: integration_test\.go
-      linters:
-        - gosec
